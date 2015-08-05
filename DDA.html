@@ -1,0 +1,62 @@
+<html>
+	
+	<body onload="main();">
+		<canvas id="canvas"> </canvas> 
+	</body>
+	
+	<script>
+		var cv;
+		var ctx;
+		
+		function main(){
+			cv = document.getElementById("canvas");
+			ctx = cv.getContext("2d");
+				
+			cv.width = 800;
+			cv.height = 600;
+			
+			setPixel( 500, 300, [255,0,0,255] );
+			
+			drawRect([0,0], [800,600], [0,0,0,255]);
+		}
+
+		function setPixel( x, y, cor ){
+			var id = ctx.createImageData(1,1);
+			var d  = id.data; 
+			d[0]   = cor[0];
+			d[1]   = cor[1];
+			d[2]   = cor[2];
+			d[3]   = cor[3];
+			
+			ctx.putImageData( id, Math.floor(x+0.5), Math.floor(y+0.5) );    
+		}
+		
+		function drawRect(xy, xy2, cor){
+			
+			var steps;
+			var dy = xy2[1] - xy[1];
+			var dx = xy2[0] - xy[0];
+			
+			var x = xy[0], y = xy[1];
+			
+			var incX, incY;
+			
+			if (Math.abs(dx) > Math.abs(dy)){
+				steps = dx;
+			} else {
+				steps = dy;
+			}
+			incX = dx/steps;
+			incY = dy/steps;
+			
+			setPixel(Math.floor(xy[0]+0.5), Math.floor(xy[1]+0.5), cor);
+			
+			for(var k = 0; k <= steps; k++){
+				x += incX;
+				y += incY;
+				
+				setPixel(Math.floor(x+0.5), Math.floor(y+0.5), cor);
+			}
+		}
+	</script>
+</html>
