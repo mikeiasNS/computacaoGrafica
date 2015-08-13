@@ -1,0 +1,152 @@
+<html>
+	
+	<body onload="main();">
+		<canvas id="canvas"> </canvas> 
+	</body>
+	
+	<script>
+		var cv;
+		var ctx;
+		
+		function main(){
+			cv = document.getElementById("canvas");
+			ctx = cv.getContext("2d");
+				
+			cv.width = 800;
+			cv.height = 600;
+
+			DDA([0, 0], [400, 300], [255, 0, 0, 255]);
+			//Bresenhan([400,300], [0,0], [0,0,0,255]);
+			//circunferencia( [400,300], 100, [0,0,0,255]);
+		}
+
+		function setPixel( x, y, cor ){
+			var id = ctx.createImageData(1,1);
+			var d  = id.data; 
+			d[0]   = cor[0];
+			d[1]   = cor[1];
+			d[2]   = cor[2];
+			d[3]   = cor[3];
+			
+			ctx.putImageData( id, Math.floor(x+0.5), Math.floor(y+0.5) );    
+		}
+		
+		function DDA(xy, xy2, cor){
+			
+			var steps;
+			var dy = xy2[1] - xy[1];
+			var dx = xy2[0] - xy[0];
+			
+			var x = xy[0], y = xy[1];
+			
+			var incX, incY;
+			var cor2 = cor;
+			
+			if (Math.abs(dx) > Math.abs(dy)){
+				steps = Math.abs(dx);
+			} else {
+				steps = Math.abs(dy);
+			}
+
+			incX = dx/steps;
+			incY = dy/steps;
+			
+			setPixel(Math.floor(xy[0]+0.5), Math.floor(xy[1]+0.5), cor);
+			
+			for(var k = 0; k <= Math.abs(steps); k++){
+				x += incX;
+				y += incY;			
+
+				setPixel(Math.floor(x+0.5), Math.floor(y+0.5), cor);
+
+				// if (incX == 1) {
+				// 	cor2[0] = Math.floor((cor[0] * (y % 1.0)) + 0.5);
+				// 	cor2[1] = Math.floor((cor[1] * (y % 1.0)) + 0.5);
+				// 	cor2[2] = Math.floor((cor[2] * (y % 1.0)) + 0.5);
+
+				// 	setPixel(Math.floor(x+0.5), Math.floor(y+0.5) + 1, cor2);
+				// 	setPixel(Math.floor(x+0.5), Math.floor(y+0.5) - 1, cor2);
+				// } else {
+				// 	cor2[0] = Math.floor((cor[0] * (y % 1.0)) + 0.5);
+				// 	cor2[1] = Math.floor((cor[1] * (y % 1.0)) + 0.5);
+				// 	cor2[2] = Math.floor((cor[2] * (y % 1.0)) + 0.5);
+
+				// 	setPixel(Math.floor(x+0.5) + 1, Math.floor(y+0.5), cor2);
+				// 	setPixel(Math.floor(x+0.5) - 1, Math.floor(y+0.5), cor2);
+				// }
+			}
+		}
+
+		function Bresenhan(xy, xy2, cor){
+
+			var dy = xy2[1] - xy[1];
+			var dx = xy2[0] - xy[0];
+			
+			var x = xy[0], y = xy[1];
+
+			var incX, incY;
+
+			if( dx > 0 ){
+				incX = 1;
+			} else{
+				incX = -1;
+				dx = Math.abs(dx);
+			}
+
+			if( dy > 0 ){
+				incY = 1;
+			} else{
+				incY = -1;
+				dy = Math.abs(dy);
+			}
+
+			var dy2 = 2*dy, dx2 = 2*dx;
+
+			if( dx > dy ){
+				var p = dy2 - dx;
+
+				for (var k = 0; k <= dx; k++) {
+					setPixel(x, y, cor);
+					if( p > 0 ){
+						y += incY;
+						p -= dx2;
+					}
+					x += incX;
+					p += dy2;
+				}
+			} else{
+				var p = dx2 - dy;
+
+				for (var k = 0; k <= dy; k++) {
+					setPixel(x, y, cor);
+					if( p > 0 ){
+						x += incX;
+						p -= dy2;
+					}
+					y += incY;
+					p += dx2;
+				}
+			}
+		}
+
+		function circunferencia(xyc, r, cor){
+			var x=0, y=r;
+			var p = 1 - r;
+
+			setPixel(x+xyc[0], y+xyc[1], cor); setPixel(-x+xyc[0],-y+xyc[1],cor);	setPixel(-x+xyc[0],y+xyc[1],cor); setPixel(x+xyc[0] ,-y+xyc[1],cor);
+			setPixel(y+xyc[0] ,x+xyc[1] ,cor); setPixel(-y+xyc[0], -x+xyc[1],cor); setPixel(-y+xyc[0],x+xyc[1],cor);	setPixel(y+xyc[0],-x+xyc[1],cor);
+
+			while(x < y){
+				if(p > 0){
+					y--;
+					p -= 2 * y;
+				}
+				x++;
+				p += 2 * x + 1;
+
+				setPixel(x+xyc[0], y+xyc[1], cor); setPixel(-x+xyc[0],-y+xyc[1],cor);	setPixel(-x+xyc[0],y+xyc[1],cor); setPixel(x+xyc[0] ,-y+xyc[1],cor);
+				setPixel(y+xyc[0] ,x+xyc[1] ,cor); setPixel(-y+xyc[0], -x+xyc[1],cor); setPixel(-y+xyc[0],x+xyc[1],cor);	setPixel(y+xyc[0],-x+xyc[1],cor);
+			}
+		}
+	</script>
+</html>
