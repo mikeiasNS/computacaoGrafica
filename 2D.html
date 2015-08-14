@@ -1,26 +1,131 @@
 <html>
+	<style>
+		.bt{
+			float: left;
+			border-radius: 5px;
+		}
+		.bt:focus{
+			outline: none;
+			box-shadow: 0px 0px 5px blue;
+		}
+		
+		.cores {
+			width: 50px;
+			height: 50px;
+			display: inline;
+			float: right;
+		}
+		
+		#vermelho {
+			background-color: red;
+		}
+		
+		#verde {
+			background-color: green;
+		}
+		
+		#azul {
+			background-color: blue;
+		}
+		
+		.selecionado {
+			outline: none;
+			box-shadow: 0px 0px 5px blue;
+		}
+		canvas{
+			border: 1px solid black;
+			clear: both;
+			display: block;
+			margin-top: 30px;
+		}
+	</style>
 	
+		
+	
+	<head>
+		<title>Paint CG</title>
+		<meta charset="UTF-8"/>
+	</head>
 	<body onload="main();">
-		<canvas id="canvas"> </canvas> 
+		<abbr title = "Reta DDA"> <button class="bt" onclick="algorithm=Algorithms.DDA; this.className+=' selecionado'">/ DDA</button> </abbr>
+		<abbr title = "Reta Bresenhan"> <button class="bt" onclick="algorithm=Algorithms.BRESENHAN">/ Br</button> </abbr>
+		<abbr title = "Circunferência"><button class="bt" onclick="algorithm=Algorithms.CIRC">O</button> </abbr>
+		<abbr title = "Elipse"> <button class="bt" onclick="algorithm=Algorithms.ELIPSE">0</button> </abbr>
+		<button class="bt" onclick="limpaCanvas()">Limpar Tela</button>
+		<div id="vermelho" class="cores" onclick="COR=[255,0,0,255]"></div>
+		<div id="verde" class="cores" onclick="COR=[0,255,0,255]"></div>
+		<div id="azul" class="cores" onclick="COR=[0,0,255,255]"></div>
+		
+		<center>
+			<canvas id="canvas"> </canvas> 
+		</center>
 	</body>
 	
 	<script>
 		var cv;
 		var ctx;
+		var algorithm;
+		
+		var COR = [];
 
 		var BLACK = [0,0,0,255], RED = [255,0,0,255];
+		
+		Algorithms = {
+			DDA : 0,
+			BRESENHAN : 1,
+			CIRC : 2,
+			ELIPSE : 3
+		}
 		
 		function main(){
 			cv = document.getElementById("canvas");
 			ctx = cv.getContext("2d");
-				
+			
 			cv.width = 800;
 			cv.height = 600;
 
-			//DDA([0, 0], [400, 300], [255, 0, 0, 255]);
-			//Bresenhan([400,300], [0,0], [0,0,0,255]);
-			//circunferencia( [600,300], 50, [0,0,0,255]);
-			elipse( [400,300], 100, 50, RED );
+			var points = [];
+			
+			cv.addEventListener("click", function(event){
+				var point = [getMousePos(cv, event).x, getMousePos(cv, event).y];
+				points.push(point);
+				if(points.length < 3 && algorithm != Algorithms.ELIPSE){
+					switch(algorithm){
+						case Algorithms.DDA:
+							DDA(points[0], points[1], COR);
+							points = [];
+							break;
+						case Algorithms.CIRC:
+							circunferencia(points[0], hip(points), COR);
+							points = [];
+							break;
+						case Algorithms.BRESENHAN:
+							bresenhan(points[0], points[1], COR);
+							points = [];
+							break;
+					}
+				} else if (points.length == 3 && algorithm == Algorithms.ELIPSE) {
+					elipse(points[0], hip([points[0], points[1]]), hip([points[0], points[2]]), COR);
+					points = [];
+				}
+			});
+		}
+		
+		function hip(points){
+			console.log(points);
+			return Math.sqrt(Math.pow((points[1][1] - points[0][1]), 2) + Math.pow((points[1][0] - points[0][0]), 2));
+		}
+		
+		function limpaCanvas(){
+			ctx.clearRect(0, 0, cv.width, cv.height);
+		}
+		
+		function getMousePos(canvas, evt) {
+			var rect = canvas.getBoundingClientRect();
+			return {
+				x: Math.round(evt.clientX - rect.left),
+				y: Math.round(evt.clientY - rect.top)
+			};
 		}
 
 		function setPixel( x, y, cor ){
@@ -35,6 +140,7 @@
 		}
 		
 		function DDA(xy, xy2, cor){
+			console.log(xy, xy2);
 			
 			var steps;
 			var dy = xy2[1] - xy[1];
@@ -54,17 +160,17 @@
 			incX = dx/steps;
 			incY = dy/steps;
 			
-			setPixel(Math.floor(xy[0]+0.5), Math.floor(xy[1]+0.5), cor);
+			setPixel(Math.round(xy[0]), Math.round(xy[1]), cor);
 			
 			for(var k = 0; k <= Math.abs(steps); k++){
 				x += incX;
-				y += incY;			
-
-				setPixel(Math.floor(x+0.5), Math.floor(y+0.5), cor);
+				y += incY;
+					
+				setPixel(Math.round(x), Math.round(y), cor);
 			}
 		}
 
-		function Bresenhan(xy, xy2, cor){
+		function bresenhan(xy, xy2, cor){
 
 			var dy = xy2[1] - xy[1];
 			var dx = xy2[0] - xy[0];
@@ -117,13 +223,15 @@
 		}
 
 		function circunferencia(xyc, r, cor){
+			console.log(xyc, r);
 			var x=0, y=r;
 			var p = 1 - r;
 
 			setPixel(x+xyc[0], y+xyc[1], cor); setPixel(-x+xyc[0],-y+xyc[1],cor);	setPixel(-x+xyc[0],y+xyc[1],cor); setPixel(x+xyc[0] ,-y+xyc[1],cor);
 			setPixel(y+xyc[0] ,x+xyc[1] ,cor); setPixel(-y+xyc[0], -x+xyc[1],cor); setPixel(-y+xyc[0],x+xyc[1],cor);	setPixel(y+xyc[0],-x+xyc[1],cor);
 
-			while(x < y){
+			//for(var k=0; k<r*0.75;k++){
+			while(x < y + 1){
 				if(p > 0){
 					y--;
 					p -= 2 * y;
@@ -134,15 +242,6 @@
 				setPixel(x+xyc[0], y+xyc[1], cor); setPixel(-x+xyc[0],-y+xyc[1],cor); setPixel(-x+xyc[0],y+xyc[1],cor); setPixel(x+xyc[0] ,-y+xyc[1],cor);
 				setPixel(y+xyc[0] ,x+xyc[1] ,cor); setPixel(-y+xyc[0], -x+xyc[1],cor); setPixel(-y+xyc[0],x+xyc[1],cor); setPixel(y+xyc[0],-x+xyc[1],cor);
 			}
-		}
-
-		function sleep(milliseconds) {
-		  	var start = new Date().getTime();
-		  	for (var i = 0; i < 1e7; i++) {
-		    	if ((new Date().getTime() - start) > milliseconds){
-		      		break;
-		    	}
-		 	}
 		}
 
 		function elipse(ponto, r1, r2, cor){
