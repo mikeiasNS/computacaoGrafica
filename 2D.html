@@ -14,6 +14,8 @@
 			height: 50px;
 			display: inline;
 			float: right;
+			margin-right: 2px;
+			border-radius: 5px;
 		}
 		
 		#vermelho {
@@ -27,10 +29,18 @@
 		#azul {
 			background-color: blue;
 		}
+
+		#preto{
+			background-color: black;
+		}
 		
 		.selecionado {
 			outline: none;
 			box-shadow: 0px 0px 5px blue;
+		}
+
+		.selectedColor{
+			box-shadow: 0px 0px 10px 5px gray;
 		}
 		canvas{
 			border: 1px solid black;
@@ -39,22 +49,40 @@
 			margin-top: 30px;
 		}
 	</style>
-	
-		
+	<script type="text/javascript">
+		function selectAction(id){
+			document.getElementById("dda").className = "bt";
+			document.getElementById("brese").className = "bt";
+			document.getElementById("circ").className = "bt";
+			document.getElementById("eli").className = "bt";
+
+			document.getElementById(id).className += " selecionado";
+		}
+
+		function selectColor(id){
+			document.getElementById("preto").className = "cores";
+			document.getElementById("vermelho").className = "cores";
+			document.getElementById("verde").className = "cores";
+			document.getElementById("azul").className = "cores";
+
+			document.getElementById(id).className += " selectedColor";
+		}
+	</script>	
 	
 	<head>
 		<title>Paint CG</title>
 		<meta charset="UTF-8"/>
 	</head>
 	<body onload="main();">
-		<abbr title = "Reta DDA"> <button class="bt" onclick="algorithm=Algorithms.DDA; this.className+=' selecionado'">/ DDA</button> </abbr>
-		<abbr title = "Reta Bresenhan"> <button class="bt" onclick="algorithm=Algorithms.BRESENHAN">/ Br</button> </abbr>
-		<abbr title = "Circunferência"><button class="bt" onclick="algorithm=Algorithms.CIRC">O</button> </abbr>
-		<abbr title = "Elipse"> <button class="bt" onclick="algorithm=Algorithms.ELIPSE">0</button> </abbr>
+		<abbr title = "Reta DDA"> <button class="bt selecionado" id="dda" onclick="algorithm=Algorithms.DDA; selectAction(this.id);">/ DDA</button> </abbr>
+		<abbr title = "Reta Bresenhan"> <button class="bt" id="brese" onclick="algorithm=Algorithms.BRESENHAN; selectAction(this.id);">/ Br</button> </abbr>
+		<abbr title = "Circunferência"><button class="bt" id="circ" onclick="algorithm=Algorithms.CIRC; selectAction(this.id);">O</button> </abbr>
+		<abbr title = "Elipse"> <button class="bt" id="eli" onclick="algorithm=Algorithms.ELIPSE; selectAction(this.id);">0</button> </abbr>
 		<button class="bt" onclick="limpaCanvas()">Limpar Tela</button>
-		<div id="vermelho" class="cores" onclick="COR=[255,0,0,255]"></div>
-		<div id="verde" class="cores" onclick="COR=[0,255,0,255]"></div>
-		<div id="azul" class="cores" onclick="COR=[0,0,255,255]"></div>
+		<div id="preto" class="cores" onclick="COR=[0,0,0,255]; selectColor(this.id);"></div>
+		<div id="vermelho" class="cores" onclick="COR=[255,0,0,255]; selectColor(this.id);"></div>
+		<div id="verde" class="cores" onclick="COR=[0,255,0,255]; selectColor(this.id);"></div>
+		<div id="azul" class="cores" onclick="COR=[0,0,255,255]; selectColor(this.id);"></div>
 		
 		<center>
 			<canvas id="canvas"> </canvas> 
@@ -64,18 +92,17 @@
 	<script>
 		var cv;
 		var ctx;
-		var algorithm;
-		
-		var COR = [];
 
-		var BLACK = [0,0,0,255], RED = [255,0,0,255];
-		
 		Algorithms = {
 			DDA : 0,
 			BRESENHAN : 1,
 			CIRC : 2,
 			ELIPSE : 3
 		}
+		
+		var algorithm = Algorithms.DDA;
+		
+		var COR = [0, 0, 0, 255];
 		
 		function main(){
 			cv = document.getElementById("canvas");
@@ -89,7 +116,7 @@
 			cv.addEventListener("click", function(event){
 				var point = [getMousePos(cv, event).x, getMousePos(cv, event).y];
 				points.push(point);
-				if(points.length < 3 && algorithm != Algorithms.ELIPSE){
+				if(points.length == 2 && algorithm != Algorithms.ELIPSE){
 					switch(algorithm){
 						case Algorithms.DDA:
 							DDA(points[0], points[1], COR);
@@ -139,9 +166,7 @@
 			ctx.putImageData( id, Math.floor(x+0.5), Math.floor(y+0.5) );    
 		}
 		
-		function DDA(xy, xy2, cor){
-			console.log(xy, xy2);
-			
+		function DDA(xy, xy2, cor){			
 			var steps;
 			var dy = xy2[1] - xy[1];
 			var dx = xy2[0] - xy[0];
