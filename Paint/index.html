@@ -80,7 +80,7 @@
 		<abbr title = "Reta Bresenhan"> <button class="bt" id="brese" onclick="algorithm=Algorithms.BRESENHAN; selectAction(this.id);">/ Br</button> </abbr>
 		<abbr title = "Circunferência"><button class="bt" id="circ" onclick="algorithm=Algorithms.CIRC; selectAction(this.id);">O</button> </abbr>
 		<abbr title = "Elipse"> <button class="bt" id="eli" onclick="algorithm=Algorithms.ELIPSE; selectAction(this.id);">0</button> </abbr>
-		<button class="bt" onclick="clean()">Limpar Tela</button>
+		<button class="bt" onclick="limpaCanvas()">Limpar Tela</button>
 		<div id="preto" class="cores" onclick="COR=[0,0,0,255]; selectColor(this.id);"></div>
 		<div id="vermelho" class="cores" onclick="COR=[255,0,0,255]; selectColor(this.id);"></div>
 		<div id="verde" class="cores" onclick="COR=[0,255,0,255]; selectColor(this.id);"></div>
@@ -105,8 +105,6 @@
 			CIRC : 2,
 			ELIPSE : 3
 		}
-
-		var draws = [];
 
 		var algorithm = Algorithms.DDA;
 		
@@ -156,25 +154,6 @@
 
 			cv.onmouseup = function(event){
 				limpaCanvas();
-				var point = [getMousePos(cv, event).x, getMousePos(cv, event).y];
-				var draw = [algorithm];
-				switch(algorithm){
-					case Algorithms.ELIPSE:
-						draw.push($.extend(true, {}, points[0]));
-						draw.push($.extend(true, {}, Math.abs(point[0] - points[0][0]) ));
-						draw.push($.extend(true, {}, Math.abs(point[1] - points[0][1]) ));
-						break;
-					case Algorithms.CIRC:
-						draw.push($.extend(true, {}, points[0]));
-						draw.push(hip2(points,point));
-						break;
-					default:
-						draw.push($.extend(true, {}, points[0]));
-						draw.push($.extend(true, {}, point ));
-						break;
-				}
-				draws.push(draw);
-
 				drawing();
 			}
 		}
@@ -212,27 +191,6 @@
 		
 		function limpaCanvas(){
 			ctx.clearRect(0, 0, cv.width, cv.height);
-			for(var i = 0; i < draws.length; i++){
-				switch(draws[i][0]){
-				case Algorithms.DDA:
-					DDA(draws[i][1], draws[i][2], COR);
-					break;
-				case Algorithms.CIRC:
-					circunferencia(draws[i][1], draws[i][2], COR);
-					break;
-				case Algorithms.BRESENHAN:
-					bresenhan(draws[i][1], draws[i][2], COR);
-					break;
-				case Algorithms.ELIPSE:
-					elipse(draws[i][1], draws[i][2], draws[i][3], COR);
-					break;
-				}
-			}
-		}
-
-		function clean(){
-			ctx.clearRect(0, 0, cv.width, cv.height);
-			draws = [];
 		}
 		
 		function getMousePos(canvas, evt) {
