@@ -69,6 +69,8 @@
 		}
 	</script>	
 	
+	<script type="text/javascript" src="jquery.js"></script>
+
 	<head>
 		<title>Paint CG</title>
 		<meta charset="UTF-8"/>
@@ -78,11 +80,15 @@
 		<abbr title = "Reta Bresenhan"> <button class="bt" id="brese" onclick="algorithm=Algorithms.BRESENHAN; selectAction(this.id);">/ Br</button> </abbr>
 		<abbr title = "Circunferência"><button class="bt" id="circ" onclick="algorithm=Algorithms.CIRC; selectAction(this.id);">O</button> </abbr>
 		<abbr title = "Elipse"> <button class="bt" id="eli" onclick="algorithm=Algorithms.ELIPSE; selectAction(this.id);">0</button> </abbr>
-		<button class="bt" onclick="limpaCanvas()">Limpar Tela</button>
+		<button class="bt" onclick="clean()">Limpar Tela</button>
 		<div id="preto" class="cores" onclick="COR=[0,0,0,255]; selectColor(this.id);"></div>
 		<div id="vermelho" class="cores" onclick="COR=[255,0,0,255]; selectColor(this.id);"></div>
 		<div id="verde" class="cores" onclick="COR=[0,255,0,255]; selectColor(this.id);"></div>
 		<div id="azul" class="cores" onclick="COR=[0,0,255,255]; selectColor(this.id);"></div>
+
+		<div id="Pcolor">
+			<input type="number" min>
+		</div>
 		
 		<center>
 			<canvas id="canvas"> </canvas> 
@@ -100,6 +106,8 @@
 			ELIPSE : 3
 		}
 
+		var draws = [];
+
 		var algorithm = Algorithms.DDA;
 		
 		var COR = [0, 0, 0, 255];
@@ -113,11 +121,12 @@
 			cv.width = 800;
 			cv.height = 600;
 
-			var wait = false;
+			var wait = true;
 
 			cv.onmousedown = function(event){
 				var point = [getMousePos(cv, event).x, getMousePos(cv, event).y];
 				points.push(point);
+				setTimeout(function(){ wait = false }, 10);
 			}
 
 			cv.onmousemove = function(event){
@@ -141,17 +150,36 @@
 						elipse(points[0], Math.abs(point[0] - points[0][0]), Math.abs(point[1] - points[0][1]), COR);
 						break;
 					}
-					setTimeout(function(){ wait = false }, 100);
+					setTimeout(function(){ wait = false }, 10);
 				}
 			}
 
 			cv.onmouseup = function(event){
 				limpaCanvas();
-				draw();
+				var point = [getMousePos(cv, event).x, getMousePos(cv, event).y];
+				var draw = [algorithm];
+				switch(algorithm){
+					case Algorithms.ELIPSE:
+						draw.push($.extend(true, {}, points[0]));
+						draw.push($.extend(true, {}, Math.abs(point[0] - points[0][0]) ));
+						draw.push($.extend(true, {}, Math.abs(point[1] - points[0][1]) ));
+						break;
+					case Algorithms.CIRC:
+						draw.push($.extend(true, {}, points[0]));
+						draw.push(hip2(points,point));
+						break;
+					default:
+						draw.push($.extend(true, {}, points[0]));
+						draw.push($.extend(true, {}, point ));
+						break;
+				}
+				draws.push(draw);
+
+				drawing();
 			}
 		}
 
-		function draw(){
+		function drawing(){
 			var point = [getMousePos(cv, event).x, getMousePos(cv, event).y];
 			points.push(point);
 			switch(algorithm){
@@ -184,6 +212,27 @@
 		
 		function limpaCanvas(){
 			ctx.clearRect(0, 0, cv.width, cv.height);
+			for(var i = 0; i < draws.length; i++){
+				switch(draws[i][0]){
+				case Algorithms.DDA:
+					DDA(draws[i][1], draws[i][2], COR);
+					break;
+				case Algorithms.CIRC:
+					circunferencia(draws[i][1], draws[i][2], COR);
+					break;
+				case Algorithms.BRESENHAN:
+					bresenhan(draws[i][1], draws[i][2], COR);
+					break;
+				case Algorithms.ELIPSE:
+					elipse(draws[i][1], draws[i][2], draws[i][3], COR);
+					break;
+				}
+			}
+		}
+
+		function clean(){
+			ctx.clearRect(0, 0, cv.width, cv.height);
+			draws = [];
 		}
 		
 		function getMousePos(canvas, evt) {
