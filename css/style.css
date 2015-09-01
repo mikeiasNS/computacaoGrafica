@@ -1,0 +1,48 @@
+.bt{
+	float: left;
+	border-radius: 5px;
+}
+.bt:focus{
+	outline: none;
+	box-shadow: 0px 0px 5px blue;
+}
+
+.cores {
+	width: 50px;
+	height: 50px;
+	display: inline;
+	float: right;
+	margin-right: 2px;
+	border-radius: 5px;
+}
+
+#vermelho {
+	background-color: red;
+}
+
+#verde {
+	background-color: green;
+}
+
+#azul {
+	background-color: blue;
+}
+
+#preto{
+	background-color: black;
+}
+
+.selecionado {
+	outline: none;
+	box-shadow: 0px 0px 5px blue;
+}
+
+.selectedColor{
+	box-shadow: 0px 0px 10px 5px gray;
+}
+canvas{
+	border: 1px solid black;
+	clear: both;
+	display: block;
+	margin-top: 30px;
+}
