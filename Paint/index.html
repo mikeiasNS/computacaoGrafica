@@ -150,11 +150,11 @@
 
 			cv.onmouseup = function(event){
 				limpaCanvas();
-				drawing();
+				drawing(event);
 			}
 		}
 
-		function drawing(){
+		function drawing(event){
 			var point = [getMousePos(cv, event).x, getMousePos(cv, event).y];
 			points.push(point);
 			switch(algorithm){
