@@ -1,5 +1,22 @@
 <html>
-	<script type="text/javascript" src="../js/myJS.js"></script>	
+	<script type="text/javascript">
+		function selectAction(id){
+			document.getElementById("circ").className = "bt";
+			document.getElementById("eli").className = "bt";
+			document.getElementById("FFill").className = "bt";
+
+			document.getElementById(id).className += " selecionado";
+		}
+
+		function selectColor(id){
+			document.getElementById("preto").className = "cores";
+			document.getElementById("vermelho").className = "cores";
+			document.getElementById("verde").className = "cores";
+			document.getElementById("azul").className = "cores";
+
+			document.getElementById(id).className += " selectedColor";
+		}
+	</script>	
 
 	<head>
 		<title>CorelDraw CG</title>
@@ -7,12 +24,9 @@
 		<meta charset="UTF-8"/>
 	</head>
 	<body onload="main();">
-		<div style = "display:none">
-			<abbr title = "Reta DDA"> <button class="bt" id="dda" onclick="algorithm=Algorithms.DDA; selectAction(this.id);">/ DDA</button> </abbr>
-			<abbr title = "Reta Bresenhan"> <button class="bt" id="brese" onclick="algorithm=Algorithms.BRESENHAN; selectAction(this.id);">/ Br</button> </abbr>
-		</div>
 		<abbr title = "Circunferência"><button class="bt selecionado" id="circ" onclick="algorithm=Algorithms.CIRC; selectAction(this.id);">O</button> </abbr>
 		<abbr title = "Elipse"> <button class="bt" id="eli" onclick="algorithm=Algorithms.ELIPSE; selectAction(this.id);">0</button> </abbr>
+		<abbr title = "FFill"> <button class="bt" id="FFill" onclick="algorithm=Algorithms.FFill; selectAction(this.id);">Pinta</button> </abbr>
 		<button class="bt" onclick="limpaCanvas()">Limpar Tela</button>
 		<div id="preto" class="cores" onclick="COR=[0,0,0,255]; selectColor(this.id);"></div>
 		<div id="vermelho" class="cores" onclick="COR=[255,0,0,255]; selectColor(this.id);"></div>
@@ -30,7 +44,8 @@
 
 		Algorithms = {
 			CIRC : 0,
-			ELIPSE : 1
+			ELIPSE : 1,
+			FFill : 2
 		}
 
 		var algorithm = Algorithms.CIRC;
@@ -52,11 +67,21 @@
 				var pontoClicado = [getMousePos(cv, event).x, getMousePos(cv, event).y];
 				pontos.push(pontoClicado); 
 
+				if(algorithm == Algorithms.FFill){
+					FFill(pontoClicado, COR, getPixel(pontoClicado[0], pontoClicado[1]));
+					pontos = [];
+				}
+
 				if(pontos.length == 2){
 					desenha(event);
 				}
 			}
 		}
+
+		function getPixel(x, y){
+            var imgData = ctx.getImageData(x, y, 1, 1);
+            return imgData.data;
+        }
 
 		function getMousePos(canvas, evt) {
 			var rect = canvas.getBoundingClientRect();
@@ -100,7 +125,39 @@
 		}
 
 
+		function FFill(ponto, corF, corI){
+            var corPx = getPixel(ponto[0], ponto[1]);
+            var x = ponto[0], y = ponto[1];
+                
+            var xR = x + 1;
+            var xL = x - 1;
+            
+            if(corPx[0] == corI[0] && corPx[1] == corI[1] && corPx[2] == corI[2] && corPx[3] == corI[3]){
+            	setPixel(x, y, corF);
+            }else{
+            	return;
+            }
 
+            while(corPx[0] == corI[0] && corPx[1] == corI[1] && corPx[2] == corI[2] && corPx[3] == corI[3]){
+            	setPixel(xR, y, corF);
+
+                xR++;
+                corPx = getPixel(xR, y);
+            }
+            
+            corPx = getPixel(xL, y);
+            
+            while(corPx[0] == corI[0] && corPx[1] == corI[1] && corPx[2] == corI[2] && corPx[3] == corI[3]){
+            	setPixel(xL, y, corF);
+
+                xL--;
+                corPx = getPixel(xL, y);
+            }
+
+            FFill([x, y + 1], corF, corI);
+            FFill([x, y - 1], corF, corI);
+            
+        }
 
 		function circunferencia(xyc, r, cor){
 			var x=0, y=r;
