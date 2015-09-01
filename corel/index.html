@@ -58,8 +58,8 @@
 			cv = document.getElementById("canvas");
 			ctx = cv.getContext("2d");
 			
-			cv.width = 800;
-			cv.height = 600;
+			cv.width = 400;
+			cv.height = 300;
 
 			limpaCanvas();
 
@@ -124,39 +124,77 @@
 			}
 		}
 
+        function FFill(ponto, corF, corI){
+        	if( corI == corF ){
+        		return;
+        	}
+        	var pixels = [];
+        	pixels.push(ponto);
 
-		function FFill(ponto, corF, corI){
-            var corPx = getPixel(ponto[0], ponto[1]);
-            var x = ponto[0], y = ponto[1];
-                
-            var xR = x + 1;
-            var xL = x - 1;
-            
-            if(corPx[0] == corI[0] && corPx[1] == corI[1] && corPx[2] == corI[2] && corPx[3] == corI[3]){
-            	setPixel(x, y, corF);
-            }else{
-            	return;
-            }
+        	while(pixels.length > 0){
+        		var n = pixels[0];
+        		pixels.splice(0, 1);
 
-            while(corPx[0] == corI[0] && corPx[1] == corI[1] && corPx[2] == corI[2] && corPx[3] == corI[3]){
-            	setPixel(xR, y, corF);
+        		var corPixelAtual = getPixel(n[0], n[1]);
+        		if(corPixelAtual[0] == corI[0] && corPixelAtual[1] == corI[1] && corPixelAtual[2] == corI[2]){
+        			setPixel(n[0], n[1], corF);
 
-                xR++;
-                corPx = getPixel(xR, y);
-            }
-            
-            corPx = getPixel(xL, y);
-            
-            while(corPx[0] == corI[0] && corPx[1] == corI[1] && corPx[2] == corI[2] && corPx[3] == corI[3]){
-            	setPixel(xL, y, corF);
+        			var corPixelDireito = getPixel(n[0] + 1, n[1]);
+        			if(corPixelDireito[0] == corI[0] && corPixelDireito[1] == corI[1] && corPixelDireito[2] == corI[2]){
+        				pixels.push([n[0] + 1, n[1]]);
+        			}
+        			var corPixelEsquerdo = getPixel(n[0] - 1, n[1]);
+        			if(corPixelEsquerdo[0] == corI[0] && corPixelEsquerdo[1] == corI[1] && corPixelEsquerdo[2] == corI[2]){
+        				pixels.push([n[0] - 1, n[1]]);
+        			}
+        			var corPixelCima = getPixel(n[0], n[1] - 1);
+        			if(corPixelCima[0] == corI[0] && corPixelCima[1] == corI[1] && corPixelCima[2] == corI[2]){
+        				pixels.push([n[0], n[1] - 1]);
+        			}
+        			var corPixelBaixo = getPixel(n[0], n[1] + 1);
+        			if(corPixelBaixo[0] == corI[0] && corPixelBaixo[1] == corI[1] && corPixelBaixo[2] == corI[2]){
+        				pixels.push([n[0], n[1] + 1]);
+        			}
 
-                xL--;
-                corPx = getPixel(xL, y);
-            }
+        		}
+        	}
+        }
 
-            FFill([x, y + 1], corF, corI);
-            FFill([x, y - 1], corF, corI);
-            
+        function FFill2(ponto, corF, corI){
+        	if( corI == corF ){
+        		return;
+        	}
+        	var pixels = [];
+        	pixels.push(ponto);
+
+        	for(var i = 0; i < pixels.length; i++){
+        		var n = pixels[i];
+        		var w = [n[0]+0, n[1]+0], e = [n[0]+0, n[1]+0];
+
+        		var corW = getPixel(w[0], w[1]);
+        		while(corW[0] == corI[0] && corW[1] == corI[1] && corW[2] == corI[2]){
+        			w[0]--;
+        			corW = getPixel(w[0], w[1]);
+        		}
+        		var corE = getPixel(e[0], e[1]);
+        		while(corE[0] == corI[0] && corE[1] == corI[1] && corE[2] == corI[2]){
+        			e[0]++;
+        			corE = getPixel(e[0], e[1]);
+        		}
+
+        		for(var j = w[0]+1; j < e[0]; j++){
+        			setPixel(j, n[1], corF); 
+
+        			var corPixelDeCima = getPixel(n[0], n[1]-1);
+	        		if(corPixelDeCima[0] == corI[0] && corPixelDeCima[1] == corI[1] && corPixelDeCima[2] == corI[2]){
+	        			pixels.push([n[0], n[1]-1]);
+	        		}
+	        		var corPixelDeBaixo = getPixel(n[0], n[1]+1);
+	        		if(corPixelDeBaixo[0] == corI[0] && corPixelDeBaixo[1] == corI[1] && corPixelDeBaixo[2] == corI[2]){
+	        			pixels.push([n[0], n[1]+1]);
+	        		}
+        		}
+        	}
         }
 
 		function circunferencia(xyc, r, cor){
