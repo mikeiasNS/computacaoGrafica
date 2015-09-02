@@ -5,6 +5,7 @@
 			document.getElementById("eli").className = "bt";
 			document.getElementById("FFill").className = "bt";
 			document.getElementById("BFill").className = "bt";
+			document.getElementById("polig").className = "bt";
 
 			document.getElementById(id).className += " selecionado";
 		}
@@ -22,6 +23,7 @@
 	<script type="text/javascript" src="../js/elipseECirc.js"></script>
 	<script type="text/javascript" src="../js/fFill.js"></script>
 	<script type="text/javascript" src="../js/bFill.js"></script>
+	<script type="text/javascript" src="../js/scanLine.js"></script>
 	<head>
 		<title>CorelDraw CG</title>
 		<link rel="stylesheet" type="text/css" href="../css/style.css" />
@@ -32,6 +34,8 @@
 		<abbr title = "Elipse"> <button class="bt" id="eli" onclick="algorithm=Algorithms.ELIPSE; selectAction(this.id);">0</button> </abbr>
 		<abbr title = "FFill"> <button class="bt" id="FFill" onclick="algorithm=Algorithms.FFill; selectAction(this.id);">Pinta F</button> </abbr>
 		<abbr title = "BFill"> <button class="bt" id="BFill" onclick="algorithm=Algorithms.BFill; selectAction(this.id);">Pinta B</button> </abbr>
+		<abbr title = "Poligono"> <button class="bt" id="polig" onclick="algorithm=Algorithms.Polig; selectAction(this.id);">Polig</button> </abbr>
+		<abbr title = "Poligono"> <button class="bt" id="cpolig" onclick="scanLine(pontos,COR);closePol();">Fecha e pinta Polig</button> </abbr>
 		<button class="bt" onclick="limpaCanvas()">Limpar Tela</button>
 		<div id="preto" class="cores" onclick="COR=[0,0,0,255]; selectColor(this.id);"></div>
 		<div id="vermelho" class="cores" onclick="COR=[255,0,0,255]; selectColor(this.id);"></div>
@@ -77,7 +81,7 @@
 				if((pontos.length == 2 && algorithm != Algorithms.Polig) || (algorithm == Algorithms.BFill || algorithm == Algorithms.FFill)){
 					desenha(pontoClicado);
 				} else if(algorithm == Algorithms.Polig){
-
+					bresenhan( pontos[ pontos.length - 1 ], pontos[ pontos.length - 2 ], [0, 0, 0, 255] );
 				}
 			}
 		}
@@ -109,10 +113,18 @@
 		function limpaCanvas(){
 			ctx.fillStyle = "#FFFFFF";
 			ctx.fillRect(0, 0, cv.width, cv.height);
+			pontos = [];
 		}
 
 		function hip(points){
 			return Math.sqrt(Math.pow((points[1][1] - points[0][1]), 2) + Math.pow((points[1][0] - points[0][0]), 2));
+		}
+
+		function closePol(){
+			if(pontos.length > 2){
+				bresenhan(pontos[ pontos.length-1 ], pontos[0], [0, 0, 0, 255]);
+			}
+			pontos = [];
 		}
 
 		function desenha(pontoClicado){
