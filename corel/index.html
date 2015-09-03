@@ -75,7 +75,7 @@
 			limpaCanvas();
 
 			cv.onmousedown = function(event){
-				var pontoClicado = [getMousePos(cv, event).x, getMousePos(cv, event).y];
+				var pontoClicado = [getMousePos(cv, event).x, getMousePos(cv, event).y, COR];
 				pontos.push(pontoClicado); 
 
 				if((pontos.length == 2 && algorithm != Algorithms.Polig) || (algorithm == Algorithms.BFill || algorithm == Algorithms.FFill)){

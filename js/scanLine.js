@@ -1,6 +1,8 @@
-function scanLine(vertices, cor){
-	console.log(vertices);
+function sortNumber(a,b) {
+    return a[0] - b[0];
+}
 
+function scanLine(vertices, cor){
 	var maiorY = vertices[0][1];
 	var menorY = vertices[0][1];
 	for(var i = 1; i < vertices.length; i++){
@@ -51,14 +53,27 @@ function scanLine(vertices, cor){
 			var xDaIntersecao;
 			if(ta >= 0 && ta < 1){
 				xDaIntersecao = x0a + ta * (xfa - x0a);
-				intersecoes.push(xDaIntersecao);
+				intersecoes.push([xDaIntersecao, ta, j]);
 			}
 		}
-		intersecoes = intersecoes.sort();
+		intersecoes.sort(sortNumber);
 		// pinta a linha
 		for (var k = 0; k < intersecoes.length - 1; k+=2) {
-			var teste = intersecoes[k];
-			bresenhan( [intersecoes[k], i], [intersecoes[k + 1], i], cor );
+			for(var xDoFor = intersecoes[k][0]; xDoFor < intersecoes[k + 1][0]; xDoFor++){
+				var t = intersecoes[k][1];
+				var v = intersecoes[k][2];
+
+				var cor1 = [t * vertices[v][2][0], t * vertices[v][2][1], t * vertices[v][2][2]];
+				if(v == vertices.length - 1){
+					var cor2 = [(1 - t) * vertices[0][2][0], (1 - t) * vertices[0][2][1], (1 - t) * vertices[0][2][2]];
+				} else{
+					var cor2 = [(1 - t) * vertices[v + 1][2][0], (1 - t) * vertices[v + 1][2][1], (1 - t) * vertices[v + 1][2][2]];
+				}
+				var corFinal = [cor1[0] + cor2[0], cor1[1] + cor2[1], cor1[2] + cor2[2], 255];
+
+				setPixel(xDoFor, i, corFinal);
+			}
+			// bresenhan( [intersecoes[k], i], [intersecoes[k + 1], i], cor );
 		}
 	}
 }
