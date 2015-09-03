@@ -35,7 +35,7 @@
 		<abbr title = "FFill"> <button class="bt" id="FFill" onclick="algorithm=Algorithms.FFill; selectAction(this.id);">Pinta F</button> </abbr>
 		<abbr title = "BFill"> <button class="bt" id="BFill" onclick="algorithm=Algorithms.BFill; selectAction(this.id);">Pinta B</button> </abbr>
 		<abbr title = "Poligono"> <button class="bt" id="polig" onclick="algorithm=Algorithms.Polig; selectAction(this.id);">Polig</button> </abbr>
-		<abbr title = "Poligono"> <button class="bt" id="cpolig" onclick="scanLine(pontos,COR);closePol();">Fecha e pinta Polig</button> </abbr>
+		<abbr title = "Poligono"> <button class="bt" id="cpolig" onclick="scanLine(pontos,COR);closePol();pontos = [];">Fecha e pinta Polig</button> </abbr>
 		<button class="bt" onclick="limpaCanvas()">Limpar Tela</button>
 		<div id="preto" class="cores" onclick="COR=[0,0,0,255]; selectColor(this.id);"></div>
 		<div id="vermelho" class="cores" onclick="COR=[255,0,0,255]; selectColor(this.id);"></div>
@@ -80,7 +80,7 @@
 
 				if((pontos.length == 2 && algorithm != Algorithms.Polig) || (algorithm == Algorithms.BFill || algorithm == Algorithms.FFill)){
 					desenha(pontoClicado);
-				} else if(algorithm == Algorithms.Polig){
+				} else if(algorithm == Algorithms.Polig && pontos.length > 1){
 					bresenhan( pontos[ pontos.length - 1 ], pontos[ pontos.length - 2 ], [0, 0, 0, 255] );
 				}
 			}
@@ -124,7 +124,6 @@
 			if(pontos.length > 2){
 				bresenhan(pontos[ pontos.length-1 ], pontos[0], [0, 0, 0, 255]);
 			}
-			pontos = [];
 		}
 
 		function desenha(pontoClicado){
