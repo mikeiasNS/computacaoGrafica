@@ -53,22 +53,33 @@ function scanLine(vertices, cor){
 			var xDaIntersecao;
 			if(ta >= 0 && ta < 1){
 				xDaIntersecao = x0a + ta * (xfa - x0a);
-				intersecoes.push([xDaIntersecao, ta, j]);
+
+				var cor1 = [ta * vertices[j][2][0], ta * vertices[j][2][1], ta * vertices[j][2][2]];
+				if(j == vertices.length - 1){
+					var cor2 = [(1 - ta) * vertices[0][2][0], (1 - ta) * vertices[0][2][1], (1 - ta) * vertices[0][2][2]];
+				} else{
+					var cor2 = [(1 - ta) * vertices[j + 1][2][0], (1 - ta) * vertices[j + 1][2][1], (1 - ta) * vertices[j + 1][2][2]];
+				}
+				var corFinal = [cor1[0] + cor2[0], cor1[1] + cor2[1], cor1[2] + cor2[2], 255];
+
+				intersecoes.push([xDaIntersecao, ta, corFinal]);
 			}
 		}
 		intersecoes.sort(sortNumber);
 		// pinta a linha
 		for (var k = 0; k < intersecoes.length - 1; k+=2) {
 			for(var xDoFor = intersecoes[k][0]; xDoFor < intersecoes[k + 1][0]; xDoFor++){
-				var t = intersecoes[k][1];
-				var v = intersecoes[k][2];
+				var t = (xDoFor - intersecoes[k][0]) / (intersecoes[k + 1][0] - intersecoes[k][0]);
+				var r = intersecoes[k][2][0];
+				var g = intersecoes[k][2][1];
+				var b = intersecoes[k][2][2];
+				var r2 = intersecoes[k + 1][2][0];
+				var g2 = intersecoes[k + 1][2][1];
+				var b2 = intersecoes[k + 1][2][2];
 
-				var cor1 = [t * vertices[v][2][0], t * vertices[v][2][1], t * vertices[v][2][2]];
-				if(v == vertices.length - 1){
-					var cor2 = [(1 - t) * vertices[0][2][0], (1 - t) * vertices[0][2][1], (1 - t) * vertices[0][2][2]];
-				} else{
-					var cor2 = [(1 - t) * vertices[v + 1][2][0], (1 - t) * vertices[v + 1][2][1], (1 - t) * vertices[v + 1][2][2]];
-				}
+				var cor1 = [t * r, t * g, t * b];
+				var cor2 = [(1 - t) * r2, (1 - t) * g2, (1 - t) * b2];
+
 				var corFinal = [cor1[0] + cor2[0], cor1[1] + cor2[1], cor1[2] + cor2[2], 255];
 
 				setPixel(xDoFor, i, corFinal);
