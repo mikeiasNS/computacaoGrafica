@@ -74,6 +74,8 @@
 
 			limpaCanvas();
 
+			scanLine([[300, 200, [0, 0, 0, 255]], [300, 400, [0, 0, 255, 255]], [500, 400, [0, 255, 0, 255]], [500, 200, [255, 0, 0, 255]] ], [0,0,0,255]);
+
 			cv.onmousedown = function(event){
 				var pontoClicado = [getMousePos(cv, event).x, getMousePos(cv, event).y, COR];
 				pontos.push(pontoClicado); 
