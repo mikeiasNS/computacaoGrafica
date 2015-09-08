@@ -19,6 +19,7 @@ function scanLine(vertices, cor){
 		//percorre os vertices para calcular os t`s
 		for(var j = 0; j < vertices.length; j++){
 			// achar o y0, yf, x0 e xf da aresta
+			var y0j = true;
 			var y0a, yfa, ta, x0a, xfa;
 			if(j == vertices.length-1){
 				// compare com o primeiro
@@ -28,6 +29,7 @@ function scanLine(vertices, cor){
 					x0a = vertices[0][0];
 					xfa = vertices[j][0];
 				} else{
+					y0j = false;
 					yfa = vertices[0][1];
 					y0a = vertices[j][1];
 					xfa = vertices[0][0];
@@ -41,6 +43,7 @@ function scanLine(vertices, cor){
 					x0a = vertices[j + 1][0];
 					xfa = vertices[j][0];
 				} else{
+					y0j = false;
 					yfa = vertices[j + 1][1];
 					y0a = vertices[j][1];
 					xfa = vertices[j + 1][0];
@@ -56,14 +59,26 @@ function scanLine(vertices, cor){
 
 				var cor1;
 				var cor2;
-				cor1 = [(1 - ta) * vertices[j][2][0], (1 - ta) * vertices[j][2][1], (1 - ta) * vertices[j][2][2]];
-				if(j == vertices.length - 1){
-					cor2 = [ta * vertices[0][2][0], ta * vertices[0][2][1], ta * vertices[0][2][2]];
-				} else{
-					cor2 = [ta * vertices[j + 1][2][0], ta * vertices[j + 1][2][1], ta * vertices[j + 1][2][2]];
-				}
+				var corFinal;
+				if(!y0j){
+					cor1 = [(1 - ta) * vertices[j][2][0], (1 - ta) * vertices[j][2][1], (1 - ta) * vertices[j][2][2]];
+					if(j == vertices.length - 1){
+						cor2 = [ta * vertices[0][2][0], ta * vertices[0][2][1], ta * vertices[0][2][2]];
+					} else{
+						cor2 = [ta * vertices[j + 1][2][0], ta * vertices[j + 1][2][1], ta * vertices[j + 1][2][2]];
+					}
 
-				var corFinal = [cor1[0] + cor2[0], cor1[1] + cor2[1], cor1[2] + cor2[2], 255];
+					corFinal = [cor1[0] + cor2[0], cor1[1] + cor2[1], cor1[2] + cor2[2], 255];
+				} else{
+					cor1 = [ta * vertices[j][2][0], ta * vertices[j][2][1], ta * vertices[j][2][2]];
+					if(j == vertices.length - 1){
+						cor2 = [(1 - ta) * vertices[0][2][0], (1 - ta) * vertices[0][2][1], (1 - ta) * vertices[0][2][2]];
+					} else{
+						cor2 = [(1 - ta) * vertices[j + 1][2][0], (1 - ta) * vertices[j + 1][2][1], (1 - ta) * vertices[j + 1][2][2]];
+					}
+
+					corFinal = [cor1[0] + cor2[0], cor1[1] + cor2[1], cor1[2] + cor2[2], 255];
+				}
 
 				intersecoes.push([xDaIntersecao, ta, corFinal]);
 			}
