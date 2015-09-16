@@ -35,12 +35,26 @@
 		<abbr title = "FFill"> <button class="bt" id="FFill" onclick="algorithm=Algorithms.FFill; selectAction(this.id);">Pinta F</button> </abbr>
 		<abbr title = "BFill"> <button class="bt" id="BFill" onclick="algorithm=Algorithms.BFill; selectAction(this.id);">Pinta B</button> </abbr>
 		<abbr title = "Poligono"> <button class="bt" id="polig" onclick="algorithm=Algorithms.Polig; selectAction(this.id);">Polig</button> </abbr>
-		<abbr title = "Poligono"> <button class="bt" id="cpolig" onclick="scanLine(pontos,COR);closePol();pontos = [];">Fecha e pinta Polig</button> </abbr>
+		<abbr title = "Poligono"> <button class="bt" id="cpolig" onclick="scanLine(pontos);closePol();pontos = [];">Fecha e pinta Polig</button> </abbr>
 		<button class="bt" onclick="limpaCanvas()">Limpar Tela</button>
 		<div id="preto" class="cores" onclick="COR=[0,0,0,255]; selectColor(this.id);"></div>
 		<div id="vermelho" class="cores" onclick="COR=[255,0,0,255]; selectColor(this.id);"></div>
 		<div id="verde" class="cores" onclick="COR=[0,255,0,255]; selectColor(this.id);"></div>
 		<div id="azul" class="cores" onclick="COR=[0,0,255,255]; selectColor(this.id);"></div>
+
+		<table class="janela">
+			<tr>
+				<td><input type="text" id="xiJ" class="inputJ" placeholder="X Inicial" /></td>
+				<td><input type="text" id="xfJ" class="inputJ" placeholder="X Final" /></td>
+			</tr>
+			<tr>
+				<td><input type="text" id="yiJ" class="inputJ" placeholder="Y Inicial" /></td>
+				<td><input type="text" id="yfJ" class="inputJ" placeholder="Y Final" /></td>
+			</tr>
+			<tr>
+				<td colspan="2"><input type="button" value="Atualizar janela!!!" class="bt btJ" onclick="atualizaJanela();" /></td>
+			</tr>
+		</table>
 		
 		<center>
 			<canvas id="canvas"> </canvas> 
@@ -50,6 +64,8 @@
 	<script>
 		var cv;
 		var ctx;
+
+		var janela = [0, 800, 0, 600];
 
 		Algorithms = {
 			CIRC : 0,
@@ -63,7 +79,16 @@
 
 		var COR = [0, 0, 0, 255];
 
+		//pontos VP
 		var pontos = [];
+		//pontos janela
+		var pontosJ = [];
+
+		//poligonos originais
+		var poligonosJ = [];
+
+		//poligonos VP
+		var poligonosVP = [];
 
 		function main(){
 			cv = document.getElementById("canvas");
@@ -74,11 +99,28 @@
 
 			limpaCanvas();
 
-			scanLine([[300, 200, [0, 0, 0, 255]], [300, 400, [0, 0, 255, 255]], [500, 400, [0, 255, 0, 255]], [500, 200, [255, 0, 0, 255]] ], [0,0,0,255]);
+			scanLine([ [300, 200, [0, 0, 0, 255] ], [300, 400, [0, 0, 255, 255]], [500, 400, [0, 255, 0, 255]], [500, 200, [255, 0, 0, 255]] ]);
 
 			cv.onmousedown = function(event){
 				var pontoClicado = [getMousePos(cv, event).x, getMousePos(cv, event).y, COR];
-				pontos.push(pontoClicado); 
+
+				//calcular x e y da janela
+				var xj = (janela[1] - janela[0]) * (pontoClicado[0] - 0 /*xiVP*/) / cv.width + janela[0];
+				var yj = janela[3] - (janela[3] - janela[2]) * (pontoClicado[1] - 0/*yiVP*/) / cv.height;
+
+				var pontoJanela = [xj, yj, COR];
+				pontosJ.push(pontoJanela);
+
+
+				//Calcular x e y da viewport
+				var xvp = cv.width * (xj - janela[0]) / (janela[1] - janela[0]) + 0/*xiVP*/;
+				var yvp = cv.height/*yfVP*/ - cv.height * (yj - janela[2]) / (janela[3] - janela[2]);
+
+				var pontoVP = [xvp, yvp, COR];
+
+				console.log(pontoClicado, pontoJanela, pontoVP);
+
+				pontos.push(pontoVP); 
 
 				if((pontos.length == 2 && algorithm != Algorithms.Polig) || (algorithm == Algorithms.BFill || algorithm == Algorithms.FFill)){
 					desenha(pontoClicado);
@@ -125,7 +167,38 @@
 		function closePol(){
 			if(pontos.length > 2){
 				bresenhan(pontos[ pontos.length-1 ], pontos[0], [0, 0, 0, 255]);
+				poligonosJ.push(pontosJ);
 			}
+		}
+
+		function updatePoligonos(){
+
+			for (var i = 0; i < poligonosJ.length; i++) {
+				var poligonoAtual = [];
+				for(var j = 0; j < poligonosJ[i].length; j++){
+
+					var  xj = poligonosJ[i][j][0], yj = poligonosJ[i][j][1], corP = poligonosJ[i][j][2];
+
+					//Calcular x e y da viewport
+					var xvp = cv.width * (xj - janela[0]) / (janela[1] - janela[0]) + 0/*xiVP*/;
+					var yvp = cv.height/*yfVP*/ - cv.height * (yj - janela[2]) / (janela[3] - janela[2]);
+
+					var verticeAtual = [xvp, yvp, corP];
+					poligonoAtual.push(verticeAtual);
+				}
+				scanLine(poligonoAtual);
+			}
+		}
+
+		function atualizaJanela(){
+			var xij = parseInt(document.getElementById("xiJ").value);
+			var xfj = parseInt(document.getElementById("xfJ").value);
+			var yij = parseInt(document.getElementById("yiJ").value);
+			var yfj = parseInt(document.getElementById("yfJ").value);
+
+			janela = [xij, xfj, yij, yfj];
+			limpaCanvas();
+			updatePoligonos();
 		}
 
 		function desenha(pontoClicado){

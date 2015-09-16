@@ -2,7 +2,18 @@ function sortNumber(a,b) {
     return a[0] - b[0];
 }
 
-function scanLine(vertices, cor){
+function apagaArestas(vertices){
+	for(var i = 0; i < vertices.length; i++){
+		if(i == vertices.length - 1){
+			bresenhan(vertices[i], vertices[0], [255, 255, 255, 255]);
+		} else{
+			bresenhan(vertices[i], vertices[i + 1], [255, 255, 255, 255]);
+		}
+	}
+}
+
+function scanLine(vertices){
+	apagaArestas(vertices);
 	var maiorY = vertices[0][1];
 	var menorY = vertices[0][1];
 	for(var i = 1; i < vertices.length; i++){
@@ -86,7 +97,8 @@ function scanLine(vertices, cor){
 		intersecoes.sort(sortNumber);
 		// pinta a linha
 		for (var k = 0; k < intersecoes.length - 1; k+=2) {
-			for(var x = intersecoes[k][0]; x < intersecoes[k + 1][0]; x++){
+
+			for(var x = intersecoes[k][0]; x <= intersecoes[k + 1][0]; x++){
 				var t = (x - intersecoes[k][0]) / (intersecoes[k + 1][0] - intersecoes[k][0]);
 				var r = intersecoes[k][2][0];
 				var g = intersecoes[k][2][1];
@@ -102,7 +114,6 @@ function scanLine(vertices, cor){
 
 				setPixel(x, i, corFinal);
 			}
-			// bresenhan( [intersecoes[k], i], [intersecoes[k + 1], i], cor );
 		}
 	}
 }

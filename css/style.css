@@ -16,6 +16,23 @@
 	border-radius: 5px;
 }
 
+table, tr, td{
+	border: 1px solid black;
+}
+
+.janela{
+	float: right;
+	margin-right: 1px;
+}
+
+.btJ{
+	width: 100%;
+}
+
+.inputJ{
+	width: 100px;
+}
+
 #vermelho {
 	background-color: red;
 }
