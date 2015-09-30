@@ -13,6 +13,9 @@ function apagaArestas(vertices){
 }
 
 function scanLine(vertices){
+
+	var dados = ctx.getImageData(0, 0, cv.width, cv.height);
+
 	apagaArestas(vertices);
 	var maiorY = vertices[0][1];
 	var menorY = vertices[0][1];
@@ -113,7 +116,9 @@ function scanLine(vertices){
 				var corFinal = [cor1[0] + cor2[0], cor1[1] + cor2[1], cor1[2] + cor2[2], 255];
 
 				setPixel(x, i, corFinal);
+				
 			}
 		}
 	}
+	//ctx.putImageData(dados, 0, 0);
 }

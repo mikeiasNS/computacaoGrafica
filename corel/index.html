@@ -52,7 +52,7 @@
 				<td><input type="text" id="yfJ" class="inputJ" placeholder="Y Final" /></td>
 			</tr>
 			<tr>
-				<td colspan="2"><input type="button" value="Atualizar janela!!!" class="bt btJ" onclick="atualizaJanela();" /></td>
+				<td colspan="2"><input type="button" value="Atualizar janela!!!" class="bt btJ" onclick="teste();" /></td>
 			</tr>
 		</table>
 		
@@ -66,6 +66,8 @@
 		var ctx;
 
 		var janela = [0, 800, 0, 600];
+
+		var Mprojecao; 
 
 		Algorithms = {
 			CIRC : 0,
@@ -90,16 +92,42 @@
 		//poligonos VP
 		var poligonosVP = [];
 
+		function fechaEPinta(){
+			scanLine(pontos);closePol();pontos = [];
+		}
+
+		function multiplicaMatriz(m1, m2){
+			var soma = 0;
+			var mResult = [];
+
+			for (var i = 0; i < m1.length; i++) {
+				mResult.push([]);
+				for (var j = 0; j < m2[0].length; j++) {
+					for (var k = 0; k < m2.length; k++) {
+						soma += m1[i][k] * m2[k][j];
+					}
+					mResult[i].push(soma);
+					soma = 0
+				}
+			}
+
+			return mResult;
+		}
+
 		function main(){
 			cv = document.getElementById("canvas");
 			ctx = cv.getContext("2d");
-			
+
 			cv.width = 800;
 			cv.height = 600;
 
+			var lj = janela[1] - janela[0];
+			var aj = janela[3] - janela[2];
+			Mprojecao = [[cv.width / lj, 0, (lj * 0 - cv.width * janela[0]) / lj], [0, -cv.height / aj, (aj * 600 + cv.height * janela[3]) / aj], [0, 0, 1]];
+
 			limpaCanvas();
 
-			scanLine([ [300, 200, [0, 0, 0, 255] ], [300, 400, [0, 0, 255, 255]], [500, 400, [0, 255, 0, 255]], [500, 200, [255, 0, 0, 255]] ]);
+			scanLine([ [200, 200, [0, 0, 0, 255] ], [300, 400, [0, 0, 255, 255]], [500, 400, [0, 255, 0, 255]] ] );
 
 			cv.onmousedown = function(event){
 				var pontoClicado = [getMousePos(cv, event).x, getMousePos(cv, event).y, COR];
@@ -118,8 +146,6 @@
 
 				var pontoVP = [xvp, yvp, COR];
 
-				console.log(pontoClicado, pontoJanela, pontoVP);
-
 				pontos.push(pontoVP); 
 
 				if((pontos.length == 2 && algorithm != Algorithms.Polig) || (algorithm == Algorithms.BFill || algorithm == Algorithms.FFill)){
@@ -128,6 +154,10 @@
 					bresenhan( pontos[ pontos.length - 1 ], pontos[ pontos.length - 2 ], [0, 0, 0, 255] );
 				}
 			}
+		}
+
+		function teste(){
+			scanLine(translacao([ [200, 200, [0, 0, 0, 255] ], [300, 400, [0, 0, 255, 255]], [500, 400, [0, 255, 0, 255]] ], 100, 50));
 		}
 
 		function getPixel(x, y){
@@ -154,6 +184,14 @@
 			ctx.putImageData( id, Math.floor(x+0.5), Math.floor(y+0.5) );    
 		}
 
+		function setPixel2(mat, x, y, r, g, b){
+			index = 4*x + 4*cv.width*y;
+			mat[index + 0] = r;
+			mat[index + 1] = g;
+			mat[index + 2] = b;
+			mat[index + 3] = 255;
+		}
+
 		function limpaCanvas(){
 			ctx.fillStyle = "#FFFFFF";
 			ctx.fillRect(0, 0, cv.width, cv.height);
@@ -171,21 +209,58 @@
 			}
 		}
 
+		//aplicacao das matrizes de transformacao
+		function transformacao(v, Mtransf){
+			console.log(v);
+			var novoV = [];
+			for(var i = 0; i < v.length; i++){
+				var cor = v[i][2];
+				var ponto = [ [v[i][0]], [v[i][1]], [1] ];
+				var novoPonto = multiplicaMatriz(Mtransf, ponto);
+				novoPonto = [novoPonto[0][0], novoPonto[1][0], cor];
+				novoV.push(novoPonto);
+			}
+			console.log(novoV);
+			return novoV;
+		}
+
+		function projecao(v){
+			return transformacao(v, Mprojecao);
+		}
+
+		function translacao(v, tx, ty){
+			var Mtranslacao = [ [1, 0, tx], [0, 1, ty], [0, 0, 1] ];
+			return transformacao(v, Mtranslacao);
+		}
+
+		function Escala(v, sx, sy){
+			var Mescala = [ [sx, 0, 0], [0, sy, 0], [0, 0, 1] ];
+			return transformacao(v, Mescala);
+		}
+
+		function Rotacao(v, teta){
+			var MRotacao = [ [Math.cos(teta), -Math.sin(teta), 0], [Math.sin(teta), Math.cos(teta), 0], [0, 0, 1] ];
+			return transformacao(v, Mescala);
+		}
+
 		function updatePoligonos(){
 
 			for (var i = 0; i < poligonosJ.length; i++) {
 				var poligonoAtual = [];
-				for(var j = 0; j < poligonosJ[i].length; j++){
+				// for(var j = 0; j < poligonosJ[i].length; j++){
 
-					var  xj = poligonosJ[i][j][0], yj = poligonosJ[i][j][1], corP = poligonosJ[i][j][2];
+				// 	var  xj = poligonosJ[i][j][0], yj = poligonosJ[i][j][1], corP = poligonosJ[i][j][2];
 
-					//Calcular x e y da viewport
-					var xvp = cv.width * (xj - janela[0]) / (janela[1] - janela[0]) + 0/*xiVP*/;
-					var yvp = cv.height/*yfVP*/ - cv.height * (yj - janela[2]) / (janela[3] - janela[2]);
+				// 	//Calcular x e y da viewport
+				// 	var xvp = cv.width * (xj - janela[0]) / (janela[1] - janela[0]) + 0/*xiVP*/;
+				// 	var yvp = cv.height/*yfVP*/ - cv.height * (yj - janela[2]) / (janela[3] - janela[2]);
 
-					var verticeAtual = [xvp, yvp, corP];
-					poligonoAtual.push(verticeAtual);
-				}
+				// 	var verticeAtual = [xvp, yvp, corP];
+				// 	poligonoAtual.push(verticeAtual);
+				// }
+				console.log(poligonosJ[i]);
+				poligonoAtual = projecao(poligonosJ[i]);
+				console.log(poligonoAtual);
 				scanLine(poligonoAtual);
 			}
 		}
