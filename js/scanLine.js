@@ -16,7 +16,7 @@ function scanLine(vertices){
 
 	var dados = ctx.getImageData(0, 0, cv.width, cv.height);
 
-	apagaArestas(vertices);
+	// apagaArestas(vertices);
 	var maiorY = vertices[0][1];
 	var menorY = vertices[0][1];
 	for(var i = 1; i < vertices.length; i++){
