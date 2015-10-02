@@ -185,7 +185,7 @@
 			var teta = 360/n;
 
 			var p1 = [ [pCentro[0]], [pCentro[1]-r], [1] ];
-			var pi = [ pCentro[0], pCentro[1], cor ];
+			var pi = [ pCentro[0], pCentro[1]-r, cor ];
 
 			var v = [];
 			var vr = [];
@@ -193,7 +193,7 @@
 			v.push(p1);
 			vr.push(pi);
 
-			for (var i = 0; i < n+1; i++) {
+			for (var i = 0; i < n; i++) {
 				var pAtual = v[i];
 				var mRot = rotacao(radian(teta));
 				var Mtrans1 = translacao(-pCentro[0], -pCentro[1]);
@@ -210,10 +210,11 @@
 
 		function criaRelogio(){
 
-			var R = poligN( [400, 300], 150, 12, [0, 0, 0, 255]);
+			var R = poligN( [400, 300], 150, 50, [0, 0, 0, 255]);
 			calcJ(R);
 
 			scanLine(R);
+			textTime();
 
 			var h = [ [395, 308, [255, 0, 0, 255]], [405, 308, [255, 0, 0, 255]], [400, 230, [0, 0, 255, 255]] ];
 			var m = [ [397, 308, [255, 0, 0, 255]], [403, 308, [255, 0, 0, 255]], [400, 200, [0, 255, 0, 255]] ];
@@ -232,17 +233,49 @@
 			calcJ(m);
 			calcJ(s);
 
-			scanLine(h);
-			scanLine(m);
 			scanLine(s);
+			scanLine(m);
+			scanLine(h);
 
 			setInterval( function (){
 				limpaCanvas();
 				scanLine(R);
+				textTime();
 				s = rotaciona(s, 6); 
 				m = rotaciona(m, 6/60); 
 				h = rotaciona(h, 6/3600);
 			}, 1000);
+		}
+
+		function textTime(){
+			ctx.font="20px Georgia";
+
+			ctx.fillText("XII",385,180);
+			ctx.fillText("VI",390,435);
+			ctx.fillText("III",520,307);
+			ctx.fillText("IX",255,307);
+		}
+
+		function rotacionaPonto(p, teta){
+			var pivo = [400,300];
+			var ponto = [ [p[0]], [p[1]], [1] ];
+
+			var Mtrans1 = translacao(-pivo[0], -pivo[1]);
+			var Mtrans2 = translacao(pivo[0], pivo[1]);
+			var Mrot = rotacao(radian(teta));
+
+			var novoPonto = multM(multM(multM(Mtrans2, Mrot), Mtrans1), ponto);
+
+			novoPonto = [Math.round(novoPonto[0][0]), Math.round(novoPonto[1][0])];
+
+			return novoPonto;
+		}
+
+		function desenhaPol(v){
+			for (var i = 0; i < v.length-1; i++) {
+				bresenhan([ v[i][0], v[i][1] ], [ v[i+1][0], v[i+1][1] ], [ 0, 0, 0, 255 ]);
+			}			
+
 		}
 
 		function rotaciona(v,teta){
@@ -290,11 +323,11 @@
 			ctx.putImageData( id, Math.floor(x+0.5), Math.floor(y+0.5) );    
 		}
 
-		function setPixel2(mat, x, y, r, g, b){
-			index = 4*x + 4*cv.width*y;
-			mat[index + 0] = r;
-			mat[index + 1] = g;
-			mat[index + 2] = b;
+		function setPixel2(mat, x, y, cor){
+			index = 4*Math.round(x) + 4*cv.width*Math.round(y);
+			mat[index + 0] = cor[0];
+			mat[index + 1] = cor[1];
+			mat[index + 2] = cor[2];
 			mat[index + 3] = 255;
 		}
 

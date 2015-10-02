@@ -115,10 +115,9 @@ function scanLine(vertices){
 
 				var corFinal = [cor1[0] + cor2[0], cor1[1] + cor2[1], cor1[2] + cor2[2], 255];
 
-				setPixel(x, i, corFinal);
-				
+				setPixel2(dados.data, x, i, corFinal);
 			}
 		}
 	}
-	//ctx.putImageData(dados, 0, 0);
+	ctx.putImageData(dados, 0, 0);
 }
