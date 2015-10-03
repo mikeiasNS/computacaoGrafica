@@ -153,10 +153,6 @@
 
 			cv.width = 800;
 			cv.height = 600;
-
-			
-			//var xvp = cv.width * (xj - janela[0]) / (janela[1] - janela[0]) + 0/*xiVP*/;
-			//var yvp = cv.height/*yfVP*/ - cv.height * (yj - janela[2]) / (janela[3] - janela[2]);
 			
 			calcProjecao();
 
@@ -223,8 +219,6 @@
 
 			var R = poligN( [400, 300], 150, 50, [0, 0, 0, 255]);
 			calcJ(R);
-			
-			textTime();
 
 			var h = [ [395, 308, [255, 0, 0, 255]], [405, 308, [255, 0, 0, 255]], [400, 230, [0, 0, 255, 255]] ];
 			var m = [ [397, 308, [255, 0, 0, 255]], [403, 308, [255, 0, 0, 255]], [400, 200, [0, 255, 0, 255]] ];
@@ -251,15 +245,16 @@
 			s = poligonosJ[3];
 			
 			desenhaRelogio(R, h, m, s);
+			textTime();
 
 			setInterval( function (){
 				limpaCanvas();
-				textTime();
-				s = rotaciona(s, 6); 
-				m = rotaciona(m, 6/60); 
-				h = rotaciona(h, 6/3600);
+				s = rotaciona(s, 360 - 6); 
+				m = rotaciona(m, 360 - (6/60)); 
+				h = rotaciona(h, 360 - (6/3600));
 				
 				desenhaRelogio(R, h, m, s);
+				textTime();
 			}, 1000);
 		}
 		
@@ -272,6 +267,7 @@
 		}
 
 		function textTime(){
+			//ctx.fillStyle="#FF0000";
 			ctx.font="20px Georgia";
 
 			ctx.fillText("XII",385,180);
