@@ -138,6 +138,15 @@
 			return pj;
 		}
 
+		function calcProjecao(){
+			var lj = janela[1] - janela[0];
+			var aj = janela[3] - janela[2];
+			Mprojecao = [
+				[cv.width / lj, 0, (-cv.width * janela[0]) / lj], 
+				[0, -cv.height / aj, ((cv.height * janela[2]) / aj) + cv.height ], 
+				[0, 0, 1]
+			];
+		}
 		function main(){
 			cv = document.getElementById("canvas");
 			ctx = cv.getContext("2d");
@@ -145,9 +154,11 @@
 			cv.width = 800;
 			cv.height = 600;
 
-			var lj = janela[1] - janela[0];
-			var aj = janela[3] - janela[2];
-			Mprojecao = [[cv.width / lj, 0, (lj * 0 - cv.width * janela[0]) / lj], [0, -cv.height / aj, (aj * 600 + cv.height * janela[3]) / aj], [0, 0, 1]];
+			
+			//var xvp = cv.width * (xj - janela[0]) / (janela[1] - janela[0]) + 0/*xiVP*/;
+			//var yvp = cv.height/*yfVP*/ - cv.height * (yj - janela[2]) / (janela[3] - janela[2]);
+			
+			calcProjecao();
 
 			limpaCanvas();
 
@@ -212,8 +223,7 @@
 
 			var R = poligN( [400, 300], 150, 50, [0, 0, 0, 255]);
 			calcJ(R);
-
-			scanLine(R);
+			
 			textTime();
 
 			var h = [ [395, 308, [255, 0, 0, 255]], [405, 308, [255, 0, 0, 255]], [400, 230, [0, 0, 255, 255]] ];
@@ -232,19 +242,33 @@
 			calcJ(h);
 			calcJ(m);
 			calcJ(s);
-
-			scanLine(s);
-			scanLine(m);
-			scanLine(h);
+			
+			var mEscala = escala(-1, -1);	
+			
+			R = poligonosJ[0];
+			h = poligonosJ[1];
+			m = poligonosJ[2];
+			s = poligonosJ[3];
+			
+			desenhaRelogio(R, h, m, s);
 
 			setInterval( function (){
 				limpaCanvas();
-				scanLine(R);
 				textTime();
 				s = rotaciona(s, 6); 
 				m = rotaciona(m, 6/60); 
 				h = rotaciona(h, 6/3600);
+				
+				desenhaRelogio(R, h, m, s);
 			}, 1000);
+		}
+		
+		function desenhaRelogio(R, h, m, s){
+			poligonosJ[0] = R;
+			poligonosJ[1] = h;
+			poligonosJ[2] = m;
+			poligonosJ[3] = s;
+			updatePoligonos();
 		}
 
 		function textTime(){
@@ -254,21 +278,6 @@
 			ctx.fillText("VI",390,435);
 			ctx.fillText("III",520,307);
 			ctx.fillText("IX",255,307);
-		}
-
-		function rotacionaPonto(p, teta){
-			var pivo = [400,300];
-			var ponto = [ [p[0]], [p[1]], [1] ];
-
-			var Mtrans1 = translacao(-pivo[0], -pivo[1]);
-			var Mtrans2 = translacao(pivo[0], pivo[1]);
-			var Mrot = rotacao(radian(teta));
-
-			var novoPonto = multM(multM(multM(Mtrans2, Mrot), Mtrans1), ponto);
-
-			novoPonto = [Math.round(novoPonto[0][0]), Math.round(novoPonto[1][0])];
-
-			return novoPonto;
 		}
 
 		function desenhaPol(v){
@@ -294,7 +303,21 @@
 				novoPonto = [novoPonto[0][0], novoPonto[1][0], cor];
 				novoV.push(novoPonto);
 			}
-			scanLine(novoV);
+
+			return novoV;
+		}
+		
+		function escalar(v, mEscala){
+			var novoV = [];
+			for(var i = 0; i < v.length; i++){
+				var cor = v[i][2];
+				var ponto = [ [v[i][0]], [v[i][1]], [1] ];
+
+				var novoPonto = multM(mEscala, ponto);
+
+				novoPonto = [novoPonto[0][0], novoPonto[1][0], cor];
+				novoV.push(novoPonto);
+			}
 
 			return novoV;
 		}
@@ -389,12 +412,19 @@
 
 					var  xj = poligonosJ[i][j][0], yj = poligonosJ[i][j][1], corP = poligonosJ[i][j][2];
 
-					//Calcular x e y da viewport
+					/*//Calcular x e y da viewport
 					var xvp = cv.width * (xj - janela[0]) / (janela[1] - janela[0]) + 0/*xiVP*/;
-					var yvp = cv.height/*yfVP*/ - cv.height * (yj - janela[2]) / (janela[3] - janela[2]);
+					//var yvp = cv.height - cv.height * (yj - janela[2]) / (janela[3] - janela[2]);
+					
+					var pontoJanela = [ [xj], [yj], [1] ];
+					
+					var pontoVP = multM(Mprojecao, pontoJanela);
+					//console.log()
+					
+					pontoVP = [ pontoVP[0][0], pontoVP[1][0], corP ];
 
-					var verticeAtual = [xvp, yvp, corP];
-					poligonoAtual.push(verticeAtual);
+					//var verticeAtual = [xvp, yvp, corP];
+					poligonoAtual.push(pontoVP);
 				}
 				scanLine(poligonoAtual);
 			}
@@ -408,6 +438,7 @@
 
 			janela = [xij, xfj, yij, yfj];
 			limpaCanvas();
+			calcProjecao();
 			updatePoligonos();
 		}
 
