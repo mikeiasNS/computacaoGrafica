@@ -235,6 +235,11 @@ function getPixel(x, y){
     return imgData.data;
 }
 
+function getPixel2(x, y){
+	var imgData = ctx2.getImageData( Math.round(x), Math.round(y), 1, 1);
+    return imgData.data;
+}
+
 function getMousePos(canvas, evt) {
 	var rect = canvas.getBoundingClientRect();
 	return {
@@ -322,6 +327,32 @@ function updatePoligonos(){
 			poligonoAtual.push(pontoVP);
 		}
 		scanLine(poligonoAtual);
+	}
+}
+
+function updatePoligonosTexture(){
+
+	for (var i = 0; i < poligonosJ.length; i++) {
+		var poligonoAtual = [];
+		for(var j = 0; j < poligonosJ[i].length; j++){
+
+			var  xj = poligonosJ[i][j][0], yj = poligonosJ[i][j][1], corP = poligonosJ[i][j][2];
+
+			/*//Calcular x e y da viewport
+			var xvp = cv.width * (xj - janela[0]) / (janela[1] - janela[0]) + 0/*xiVP*/;
+			//var yvp = cv.height - cv.height * (yj - janela[2]) / (janela[3] - janela[2]);
+			
+			var pontoJanela = [ [xj], [yj], [1] ];
+			
+			var pontoVP = multM(Mprojecao, pontoJanela);
+			//console.log()
+			
+			pontoVP = [ pontoVP[0][0], pontoVP[1][0], corP ];
+
+			//var verticeAtual = [xvp, yvp, corP];
+			poligonoAtual.push(pontoVP);
+		}
+		scanLineTexture(poligonoAtual);
 	}
 }
 

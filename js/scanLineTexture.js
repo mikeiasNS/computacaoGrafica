@@ -12,7 +12,7 @@ function apagaArestas(vertices){
 	}
 }
 
-function scanLine(vertices){
+function scanLineTexture(vertices){
 
 	var dados = ctx.getImageData(0, 0, cv.width, cv.height);
 
@@ -71,30 +71,30 @@ function scanLine(vertices){
 			if(ta >= 0 && ta < 1){
 				xDaIntersecao = x0a + ta * (xfa - x0a);
 
-				var cor1;
-				var cor2;
-				var corFinal;
+				var ps1;
+				var ps2;
+				var psf;
 				if(!y0j){
-					cor1 = [(1 - ta) * vertices[j][2][0], (1 - ta) * vertices[j][2][1], (1 - ta) * vertices[j][2][2]];
+					ps1 = [(1 - ta) * vertices[j][2][0], (1 - ta) * vertices[j][2][1], (1 - ta) * vertices[j][2][2]];
 					if(j == vertices.length - 1){
-						cor2 = [ta * vertices[0][2][0], ta * vertices[0][2][1], ta * vertices[0][2][2]];
+						ps2 = [ta * vertices[0][2][0], ta * vertices[0][2][1]];
 					} else{
-						cor2 = [ta * vertices[j + 1][2][0], ta * vertices[j + 1][2][1], ta * vertices[j + 1][2][2]];
+						ps2 = [ta * vertices[j + 1][2][0], ta * vertices[j + 1][2][1]];
 					}
 
-					corFinal = [cor1[0] + cor2[0], cor1[1] + cor2[1], cor1[2] + cor2[2], 255];
+					psf = [ps1[0] + ps2[0], ps1[1] + ps2[1], ps1[2] + ps2[2], 255];
 				} else{
-					cor1 = [ta * vertices[j][2][0], ta * vertices[j][2][1], ta * vertices[j][2][2]];
+					ps1 = [ta * vertices[j][2][0], ta * vertices[j][2][1]];
 					if(j == vertices.length - 1){
-						cor2 = [(1 - ta) * vertices[0][2][0], (1 - ta) * vertices[0][2][1], (1 - ta) * vertices[0][2][2]];
+						ps2 = [(1 - ta) * vertices[0][2][0], (1 - ta) * vertices[0][2][1], (1 - ta) * vertices[0][2][2]];
 					} else{
-						cor2 = [(1 - ta) * vertices[j + 1][2][0], (1 - ta) * vertices[j + 1][2][1], (1 - ta) * vertices[j + 1][2][2]];
+						ps2 = [(1 - ta) * vertices[j + 1][2][0], (1 - ta) * vertices[j + 1][2][1]];
 					}
 
-					corFinal = [cor1[0] + cor2[0], cor1[1] + cor2[1], cor1[2] + cor2[2], 255];
+					psf = [ps1[0] + ps2[0], ps1[1] + ps2[1]];
 				}
 
-				intersecoes.push([xDaIntersecao, ta, corFinal]);
+				intersecoes.push([xDaIntersecao, ta, psf]);
 			}
 		}
 		intersecoes.sort(sortNumber);
@@ -103,19 +103,22 @@ function scanLine(vertices){
 
 			for(var x = intersecoes[k][0]; x <= intersecoes[k + 1][0]; x++){
 				var t = (x - intersecoes[k][0]) / (intersecoes[k + 1][0] - intersecoes[k][0]);
-				var r = intersecoes[k][2][0];
-				var g = intersecoes[k][2][1];
-				var b = intersecoes[k][2][2];
-				var r2 = intersecoes[k + 1][2][0];
-				var g2 = intersecoes[k + 1][2][1];
-				var b2 = intersecoes[k + 1][2][2];
+				var xs = intersecoes[k][2][0];
+				var ys = intersecoes[k][2][1];
+				var xs2 = intersecoes[k + 1][2][0];
+				var ys2 = intersecoes[k + 1][2][1];
 				
-				var cor1 = [(1 - t) * r, (1 - t) * g, (1 - t) * b];
-				var cor2 = [t * r2, t * g2, t * b2];
+				var ps1 = [(1 - t) * xs, (1 - t) * ys];
+				var ps2 = [t * xs2, t * ys2];
 
-				var corFinal = [cor1[0] + cor2[0], cor1[1] + cor2[1], cor1[2] + cor2[2], 255];
+				var psf = [ps1[0] + ps2[0], ps1[1] + ps2[1]];
 
-				setPixel2(dados.data, x, i, corFinal);
+				var xDoCV2 = psf[0] * cv2.width;
+				var yDoCV2 = psf[1] * cv2.height;
+
+				var corP = getPixel2(xDoCV2, yDoCV2);
+
+				setPixel2(dados.data, x, i, corP);
 			}
 		}
 	}

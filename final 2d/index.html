@@ -34,6 +34,7 @@
 	</head>
 	<body onload="main();">
 		<button class="bt" onclick="limpaCanvas()">Limpar Tela</button>
+		<button class="bt" onclick="updatePoligonosTexture()">vai</button>
 		<input type="file" class="bt" onchange="abrirArquivo(this);"/>
 		<div id="preto" class="cores" onclick="COR=[0,0,0,255]; selectColor(this.id);"></div>
 		<div id="vermelho" class="cores" onclick="COR=[255,0,0,255]; selectColor(this.id);"></div>
@@ -68,6 +69,12 @@
 
 			cv2 = document.getElementById("canvas2");
 			ctx2 = cv2.getContext("2d");
+
+			calcProjecao();
+
+			var polig = [ [0, 0, [0, 0]], [624, 0, [1, 0]], [0, 350, [0, 1]], [624, 350, [1, 1]] ];
+
+			calcJ(polig);
 
 			img = new Image();
 			img.onload = function(e){
