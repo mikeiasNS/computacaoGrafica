@@ -1,6 +1,13 @@
 var cv;
 var ctx;
 
+//canvas de textura
+var cv2;
+var ctx2;
+
+//textura
+var img;
+
 var janela = [0, 800, 0, 600];
 
 var Mprojecao; 
@@ -52,6 +59,16 @@ function multM(m1, m2){
 	}
 
 	return mResult;
+}
+
+function abrirArquivo(objarq){
+	if(objarq.files && objarq.files[0]){
+		var leitor = new FileReader();
+		leitor.onload = function(e){				
+			img.src = e.target.result;	
+		}
+		leitor.readAsDataURL(objarq.files[0]);
+	}
 }
 
 function calcJ(v1){

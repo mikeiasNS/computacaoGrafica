@@ -1,0 +1,83 @@
+<html>
+	<script type="text/javascript">
+		function selectAction(id){
+			document.getElementById("circ").className = "bt";
+			document.getElementById("eli").className = "bt";
+			document.getElementById("FFill").className = "bt";
+			document.getElementById("BFill").className = "bt";
+			document.getElementById("polig").className = "bt";
+
+			document.getElementById(id).className += " selecionado";
+		}
+
+		function selectColor(id){
+			document.getElementById("preto").className = "cores";
+			document.getElementById("vermelho").className = "cores";
+			document.getElementById("verde").className = "cores";
+			document.getElementById("azul").className = "cores";
+
+			document.getElementById(id).className += " selectedColor";
+		}
+	</script>
+
+	<script type="text/javascript" src="../js/bresenhan.js"></script>
+	<script type="text/javascript" src="../js/elipseECirc.js"></script>
+	<script type="text/javascript" src="../js/fFill.js"></script>
+	<script type="text/javascript" src="../js/bFill.js"></script>
+	<script type="text/javascript" src="../js/scanLineTexture.js"></script>
+	<script type="text/javascript" src="../js/utility.js"></script>
+
+	<head>
+		<title>The End is comming...</title>
+		<link rel="stylesheet" type="text/css" href="../css/style.css" />
+		<meta charset="UTF-8"/>
+	</head>
+	<body onload="main();">
+		<button class="bt" onclick="limpaCanvas()">Limpar Tela</button>
+		<input type="file" class="bt" onchange="abrirArquivo(this);"/>
+		<div id="preto" class="cores" onclick="COR=[0,0,0,255]; selectColor(this.id);"></div>
+		<div id="vermelho" class="cores" onclick="COR=[255,0,0,255]; selectColor(this.id);"></div>
+		<div id="verde" class="cores" onclick="COR=[0,255,0,255]; selectColor(this.id);"></div>
+		<div id="azul" class="cores" onclick="COR=[0,0,255,255]; selectColor(this.id);"></div>
+
+		<table class="janela">
+			<tr>
+				<td><input type="text" id="xiJ" class="inputJ" placeholder="X Inicial" /></td>
+				<td><input type="text" id="xfJ" class="inputJ" placeholder="X Final" /></td>
+			</tr>
+			<tr>
+				<td><input type="text" id="yiJ" class="inputJ" placeholder="Y Inicial" /></td>
+				<td><input type="text" id="yfJ" class="inputJ" placeholder="Y Final" /></td>
+			</tr>
+			<tr>
+				<td colspan="2"><input type="button" value="Atualizar janela!!!" class="bt btJ" onclick="atualizaJanela();" /></td>
+			</tr>
+		</table>			
+
+		<canvas id="canvas"> </canvas> 
+		<canvas id="canvas2"> </canvas> 
+	</body>
+
+	<script>		
+		function main(){
+			cv = document.getElementById("canvas");
+			ctx = cv.getContext("2d");
+
+			cv.width = 800;
+			cv.height = 600;
+
+			cv2 = document.getElementById("canvas2");
+			ctx2 = cv2.getContext("2d");
+
+			img = new Image();
+			img.onload = function(e){
+				cv2.height = 350;
+				cv2.width = cv2.height*(img.naturalWidth/img.naturalHeight);
+				ctx2.drawImage(img, 0, 0, img.naturalWidth, img.naturalHeight, 0, 0, cv2.width, cv2.height);
+			}
+			
+			calcProjecao();
+
+			limpaCanvas();
+		}
+	</script>
