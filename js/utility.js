@@ -11,6 +11,7 @@ var img;
 var janela = [0, 800, 0, 600];
 
 var Mprojecao; 
+var texture;
 
 Algorithms = {
 	CIRC : 0,
@@ -236,8 +237,8 @@ function getPixel(x, y){
 }
 
 function getPixel2(x, y){
-	var imgData = ctx2.getImageData( Math.round(x), Math.round(y), 1, 1);
-    return imgData.data;
+    var c = 4*Math.round(x) + 4*cv2.width*Math.round(y);
+    return [ texture.data[c], texture.data[c+1], texture.data[c+2], texture.data[c+3] ];
 }
 
 function getMousePos(canvas, evt) {

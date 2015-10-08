@@ -15,8 +15,7 @@ function apagaArestas(vertices){
 function scanLineTexture(vertices){
 
 	var dados = ctx.getImageData(0, 0, cv.width, cv.height);
-
-	// apagaArestas(vertices);
+    
 	var maiorY = vertices[0][1];
 	var menorY = vertices[0][1];
 	for(var i = 1; i < vertices.length; i++){
@@ -75,18 +74,18 @@ function scanLineTexture(vertices){
 				var ps2;
 				var psf;
 				if(!y0j){
-					ps1 = [(1 - ta) * vertices[j][2][0], (1 - ta) * vertices[j][2][1], (1 - ta) * vertices[j][2][2]];
+					ps1 = [(1 - ta) * vertices[j][2][0], (1 - ta) * vertices[j][2][1]];
 					if(j == vertices.length - 1){
 						ps2 = [ta * vertices[0][2][0], ta * vertices[0][2][1]];
 					} else{
 						ps2 = [ta * vertices[j + 1][2][0], ta * vertices[j + 1][2][1]];
 					}
 
-					psf = [ps1[0] + ps2[0], ps1[1] + ps2[1], ps1[2] + ps2[2], 255];
+					psf = [ps1[0] + ps2[0], ps1[1] + ps2[1]];
 				} else{
 					ps1 = [ta * vertices[j][2][0], ta * vertices[j][2][1]];
 					if(j == vertices.length - 1){
-						ps2 = [(1 - ta) * vertices[0][2][0], (1 - ta) * vertices[0][2][1], (1 - ta) * vertices[0][2][2]];
+						ps2 = [(1 - ta) * vertices[0][2][0], (1 - ta) * vertices[0][2][1]];
 					} else{
 						ps2 = [(1 - ta) * vertices[j + 1][2][0], (1 - ta) * vertices[j + 1][2][1]];
 					}
@@ -117,6 +116,8 @@ function scanLineTexture(vertices){
 				var yDoCV2 = psf[1] * cv2.height;
 
 				var corP = getPixel2(xDoCV2, yDoCV2);
+                //console.log(corP);
+                //var corP = [0,0,0,255];
 
 				setPixel2(dados.data, x, i, corP);
 			}

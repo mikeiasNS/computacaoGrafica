@@ -72,7 +72,7 @@
 
 			calcProjecao();
 
-			var polig = [ [0, 0, [0, 0]], [624, 0, [1, 0]], [0, 350, [0, 1]], [624, 350, [1, 1]] ];
+			var polig = [ [0, 0, [0, 0]], [0, 350, [0, 1]], [624, 350, [1, 1]], [624, 0, [1, 0]] ];
 
 			calcJ(polig);
 
@@ -81,6 +81,7 @@
 				cv2.height = 350;
 				cv2.width = cv2.height*(img.naturalWidth/img.naturalHeight);
 				ctx2.drawImage(img, 0, 0, img.naturalWidth, img.naturalHeight, 0, 0, cv2.width, cv2.height);
+                texture = ctx2.getImageData( 0, 0, cv2.width, cv2.height );
 			}
 			
 			calcProjecao();
