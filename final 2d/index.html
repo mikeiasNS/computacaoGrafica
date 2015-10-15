@@ -64,24 +64,55 @@
 			cv = document.getElementById("canvas");
 			ctx = cv.getContext("2d");
 
-			cv.width = 800;
-			cv.height = 600;
+			cv.width = 600;
+			cv.height = 400;
 
 			cv2 = document.getElementById("canvas2");
 			ctx2 = cv2.getContext("2d");
 
 			calcProjecao();
 
-			var polig = [ [0, 0, [0, 0]], [0, 350, [0, 1]], [cv2.width, 350, [1, 1]], [cv2.width, 0, [1, 0]]];
+			/*var polig = [ [0, 0, [0, 0]], [0, 350, [0, 1]], [cv2.width, 350, [1, 1]], [cv2.width, 0, [1, 0]]];
 
-			calcJ(polig);
+			calcJ(polig);*/
+
+			var pontosCV2 = [];
+
+			cv2.onmousedown = function(event){
+				var xClicado = getMousePos(cv2, event).x;
+				var yClicado = getMousePos(cv2, event).y;
+				var pontoClicado = [xClicado, yClicado, [xClicado / cv2.width, yClicado / cv2.height]];
+
+				pontosCV2.push(pontoClicado);
+			};
+
+			window.onkeydown = function(event){ 
+				calcJ(pontosCV2);
+				pontosCV2 = [];
+
+				switch(event.keyCode){
+					case 72:
+						alert("desenhe no segundo canvas o poligono do corpo. pressione B qnd acabar");
+						break;
+					case 66:
+						alert("desenhe no segundo canvas o poligono do braço Esq. pressione L qnd acabar");
+						break;
+					case 76:
+						alert("desenhe no segundo canvas o poligono do braço Dir. pressione R qnd acabar");
+						break;
+					case 82:
+						alert("enjoy");
+						break;
+				}
+			};
 
 			img = new Image();
 			img.onload = function(e){
-				cv2.height = 350;
+				cv2.height = 400;
 				cv2.width = cv2.height*(img.naturalWidth/img.naturalHeight);
 				ctx2.drawImage(img, 0, 0, img.naturalWidth, img.naturalHeight, 0, 0, cv2.width, cv2.height);
                 texture = ctx2.getImageData( 0, 0, cv2.width, cv2.height );
+                alert("desenhe no segundo canvas o poligono da cabeça. pressione H qnd acabar");
 			}
 			
 			calcProjecao();
