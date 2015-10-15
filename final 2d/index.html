@@ -35,6 +35,7 @@
 	<body onload="main();">
 		<button class="bt" onclick="limpaCanvas()">Limpar Tela</button>
 		<button class="bt" onclick="updatePoligonosTexture()">vai</button>
+		<button class="bt" onclick="desmembra()">Desmembrar</button>
 		<input type="file" class="bt" onchange="abrirArquivo(this);"/>
 		<div id="preto" class="cores" onclick="COR=[0,0,0,255]; selectColor(this.id);"></div>
 		<div id="vermelho" class="cores" onclick="COR=[255,0,0,255]; selectColor(this.id);"></div>
@@ -51,7 +52,7 @@
 				<td><input type="text" id="yfJ" class="inputJ" placeholder="Y Final" /></td>
 			</tr>
 			<tr>
-				<td colspan="2"><input type="button" value="Atualizar janela!!!" class="bt btJ" onclick="atualizaJanela();" /></td>
+				<td colspan="2"><input type="button" value="Atualizar janela!!!" class="bt btJ" onclick="atualizaJanelaTexture();" /></td>
 			</tr>
 		</table>			
 
@@ -72,10 +73,6 @@
 
 			calcProjecao();
 
-			/*var polig = [ [0, 0, [0, 0]], [0, 350, [0, 1]], [cv2.width, 350, [1, 1]], [cv2.width, 0, [1, 0]]];
-
-			calcJ(polig);*/
-
 			var pontosCV2 = [];
 
 			cv2.onmousedown = function(event){
@@ -87,20 +84,25 @@
 			};
 
 			window.onkeydown = function(event){ 
-				calcJ(pontosCV2);
-				pontosCV2 = [];
-
 				switch(event.keyCode){
 					case 72:
+						calcJ(pontosCV2);
+						pontosCV2 = [];
 						alert("desenhe no segundo canvas o poligono do corpo. pressione B qnd acabar");
 						break;
 					case 66:
+						calcJ(pontosCV2);
+						pontosCV2 = [];
 						alert("desenhe no segundo canvas o poligono do braço Esq. pressione L qnd acabar");
 						break;
 					case 76:
+						calcJ(pontosCV2);
+						pontosCV2 = [];
 						alert("desenhe no segundo canvas o poligono do braço Dir. pressione R qnd acabar");
 						break;
 					case 82:
+						calcJ(pontosCV2);
+						pontosCV2 = [];
 						alert("enjoy");
 						break;
 				}
@@ -118,5 +120,62 @@
 			calcProjecao();
 
 			limpaCanvas();
+		}
+
+		function desmembra() {
+			setInterval(function () {
+				limpaCanvas();
+				for (var i = 0; i < poligonosJ.length; i++) {
+					/*for (var j = 0; j < poligonosJ[i].length; j++) {
+						var mTrans;
+						var mRot;
+						switch(i) {
+							case 0:
+								mTrans = translacao(0, 5);
+								mRot = rotacao(radian(5));
+								break;
+							case 1:
+								mTrans = translacao(0, -5);
+								mRot = rotacao(radian(5));
+								break;
+							case 2:
+								mTrans = translacao(-5, 0);
+								mRot = rotacao(radian(360 - 5));
+								break;
+							case 3:
+								mTrans = translacao(5, 0);
+								mRot = rotacao(radian(360 - 5));
+								break;
+						}
+						var cor = poligonosJ[i][j][2];
+						var novoP = multM(mTrans , multM(mRot, [[poligonosJ[i][j][0]], [poligonosJ[i][j][1]], [1]]));
+						novoP = [novoP[0][0], novoP[1][0], cor];
+						poligonosJ[i][j] = novoP;
+					};*/
+					var v = poligonosJ[i];
+					var tx, ty;
+					switch(i) {
+						case 0:
+							tx = 0;
+							ty = 5;
+							break;
+						case 1:
+							tx = 3;
+							ty = 5;
+							break;
+						case 2:
+							tx = -5;
+							ty = 0;
+							break;
+						case 3:
+							tx = 5;
+							ty = 0;
+							break;
+					}
+					poligonosJ[i] = rotaciona2(v,radian(90), [ v[0][0], v[0][1] ], tx, ty);
+				};
+
+				updatePoligonosTexture();
+			}, 50);
 		}
 	</script>

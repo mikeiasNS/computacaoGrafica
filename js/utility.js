@@ -201,10 +201,29 @@ function rotaciona(v,teta){
 	for(var i = 0; i < v.length; i++){
 		var cor = v[i][2];
 		var ponto = [ [v[i][0]], [v[i][1]], [1] ];
-		var pivo = [400, 300]
+		var pivo = [400, 300];
 
 		var Mtrans1 = translacao(-pivo[0], -pivo[1]);
 		var Mtrans2 = translacao(pivo[0], pivo[1]);
+		var Mrot = rotacao(radian(teta));
+
+		var novoPonto = multM(multM(multM(Mtrans2, Mrot), Mtrans1), ponto);
+
+		novoPonto = [novoPonto[0][0], novoPonto[1][0], cor];
+		novoV.push(novoPonto);
+	}
+
+	return novoV;
+}
+
+function rotaciona2(v,teta, pivo, tx, ty){
+	var novoV = [];
+	for(var i = 0; i < v.length; i++){
+		var cor = v[i][2];
+		var ponto = [ [v[i][0]], [v[i][1]], [1] ];
+
+		var Mtrans1 = translacao(-pivo[0], -pivo[1]);
+		var Mtrans2 = translacao(pivo[0] + tx, pivo[1] + ty);
 		var Mrot = rotacao(radian(teta));
 
 		var novoPonto = multM(multM(multM(Mtrans2, Mrot), Mtrans1), ponto);
@@ -286,10 +305,6 @@ function closePol(){
 	pontosJ = [];
 }
 
-function projecao(v){
-	return transformacao(v, Mprojecao);
-}
-
 function translacao(tx, ty){
 	var Mtranslacao = [ [1, 0, tx], [0, 1, ty], [0, 0, 1] ];
 	return Mtranslacao;
@@ -338,10 +353,6 @@ function updatePoligonosTexture(){
 		for(var j = 0; j < poligonosJ[i].length; j++){
 
 			var  xj = poligonosJ[i][j][0], yj = poligonosJ[i][j][1], corP = poligonosJ[i][j][2];
-
-			/*//Calcular x e y da viewport
-			var xvp = cv.width * (xj - janela[0]) / (janela[1] - janela[0]) + 0/*xiVP*/;
-			//var yvp = cv.height - cv.height * (yj - janela[2]) / (janela[3] - janela[2]);
 			
 			var pontoJanela = [ [xj], [yj], [1] ];
 			
@@ -367,6 +378,18 @@ function atualizaJanela(){
 	limpaCanvas();
 	calcProjecao();
 	updatePoligonos();
+}
+
+function atualizaJanelaTexture(){
+	var xij = parseInt(document.getElementById("xiJ").value);
+	var xfj = parseInt(document.getElementById("xfJ").value);
+	var yij = parseInt(document.getElementById("yiJ").value);
+	var yfj = parseInt(document.getElementById("yfJ").value);
+
+	janela = [xij, xfj, yij, yfj];
+	limpaCanvas();
+	calcProjecao();
+	updatePoligonosTexture();
 }
 
 function desenha(pontoClicado){
